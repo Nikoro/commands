@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://pub.dev/packages/commands_cli"><img src="https://raw.githubusercontent.com/nikoro/commands_cli/main/logo/logo.webp" width="450"/></a>
+  <a href="https://pub.dev/packages/commands_cli"><img src="https://raw.githubusercontent.com/nikoro/commands_cli/main/assets/logo.webp" width="500"/></a>
 </p>
 <p align="center">
   <a href="https://pub.dev/packages/commands_cli">
@@ -16,6 +16,10 @@
 A simple, yet powerful command-line interface (CLI) tool to define and run project-local commands, similar to a `Makefile`. 
 
 This package allows you to create a `commands.yaml` file in your project's root directory and define a set of keywords, which can then be executed from the command line.
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/nikoro/commands_cli/main/assets/demo.webp" alt="Demo" width="800"/>
+</p>
 
 ## Why use [`commands`](https://pub.dev/packages/commands_cli) instead of `Makefile`? 🤔
 
