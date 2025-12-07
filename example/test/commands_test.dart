@@ -185,8 +185,14 @@ void main() {
 
         final output = result.stdout as String;
 
-        // Should show checking message
-        expect(output, contains('${bold}Updating global commands_cli package...$reset\n'));
+        // Should show updating message (either from git or pub.dev)
+        expect(
+          output,
+          anyOf([
+            contains('${bold}Updating global commands_cli package...$reset\n'),
+            contains('${bold}Updating global commands_cli package from git...$reset\n'),
+          ]),
+        );
 
         expect(result.exitCode, equals(0));
       });
