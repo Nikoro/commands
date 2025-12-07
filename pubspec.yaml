@@ -1,5 +1,5 @@
 name: commands_cli
-description: A CLI to generate project-local command wrappers.
+description: A powerful CLI tool that generates type-safe, project-local command wrappers from YAML definitions for Dart and Flutter developers.
 version: 0.1.0
 repository: https://github.com/Nikoro/commands_cli
 issue_tracker: https://github.com/Nikoro/commands_cli/issues
