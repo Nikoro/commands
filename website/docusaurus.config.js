@@ -1,23 +1,17 @@
-import {themes as prismThemes} from 'prism-react-renderer';
-
+import { themes as prismThemes } from 'prism-react-renderer';
 const config = {
   title: 'Commands CLI',
   tagline: 'Make your CLI commands feel like a breeze',
   favicon: 'img/favicon.ico',
-
   future: {
     v4: true,
   },
 
   url: 'https://nikoro.github.io',
   baseUrl: '/commands_cli/',
-
   organizationName: 'Nikoro',
   projectName: 'commands_cli',
-
   onBrokenLinks: 'throw',
-
-  
   i18n: {
     defaultLocale: 'en',
     locales: ['en'],
@@ -26,30 +20,28 @@ const config = {
   presets: [
     [
       'classic',
-      ({
+      {
         docs: {
           sidebarPath: './sidebars.js',
-          
           editUrl:
             'https://github.com/Nikoro/commands_cli/tree/main/website/docs/',
         },
         theme: {
           customCss: './src/css/custom.css',
         },
-      }),
+      },
     ],
   ],
-
-  themeConfig:
-    ({
+  themeConfig: {
       image: 'img/logo.webp',
       colorMode: {
-        respectPrefersColorScheme: true,
+        defaultMode: "dark",
       },
       navbar: {
+        title: "Commands CLI",
         logo: {
           alt: 'Commands CLI Logo',
-          src: 'img/logo.webp',
+          src: 'img/logo_short.webp',
         },
         items: [
           {
@@ -73,7 +65,6 @@ const config = {
         darkTheme: prismThemes.dracula,
         defaultLanguage: 'yaml',
       },
-    }),
-};
-
-export default config;
+    },
+  };
+  export default config;
