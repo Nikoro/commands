@@ -12,15 +12,25 @@ function HomepageHeader() {
   return (
     <header className={clsx('hero hero--primary', styles.heroBanner)}>
       <div className="container">
-        <Heading as="h1" className="hero__title">
-          {siteConfig.title}
-        </Heading>
-        <p className="hero__subtitle">{siteConfig.tagline}</p>
+        <img
+          src="/commands_cli/img/logo.webp"
+          alt="Commands CLI Logo"
+          style={{ height: '160px', marginBottom: '1rem' }}
+        />
+        <p
+          className="hero__subtitle"
+          style={{ color: '#025597' }}
+        >
+          <span className={styles.tagline}>{siteConfig.tagline}</span>
+        </p>
+        <div>
+          <img className={styles.demoImage} src="/commands_cli/img/demo.webp" alt="Demo Preview" />
+        </div>
         <div className={styles.buttons}>
           <Link
-            className="button button--secondary button--lg"
+            className={"button " + styles.getStartedButton}
             to="/docs/intro">
-            Docusaurus Tutorial - 5min ⏱️
+            Get Started
           </Link>
         </div>
       </div>
@@ -32,12 +42,9 @@ export default function Home() {
   const {siteConfig} = useDocusaurusContext();
   return (
     <Layout
-      title={`Hello from ${siteConfig.title}`}
-      description="Description will go into a meta tag in <head />">
+      title={`${siteConfig.title}`}
+      description="Commands CLI - Make your CLI commands feel like a breeze">
       <HomepageHeader />
-      <main>
-        <HomepageFeatures />
-      </main>
     </Layout>
   );
 }
