@@ -3,6 +3,8 @@ description: A powerful CLI tool that generates type-safe, project-local command
 version: 0.3.2
 repository: https://github.com/Nikoro/commands_cli
 issue_tracker: https://github.com/Nikoro/commands_cli/issues
+homepage: https://nikoro.github.io/commands_cli
+documentation: https://nikoro.github.io/commands_cli/docs
 topics: [cli, makefile, commands, task-runner, script-manager]
 
 environment:

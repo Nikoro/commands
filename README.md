@@ -11,8 +11,8 @@
   <a href="https://opensource.org/licenses/MIT">
     <img alt="MIT License" src="https://tinyurl.com/3uf9tzpy">
   </a>
-  <a href="https://nikoro.github.io/commands_cli">
-    <img alt="Documentation" src="https://tinyurl.com/36vcuner">
+  <a href="https://nikoro.github.io/commands_cli/docs">
+    <img alt="Documentation" src="https://tinyurl.com/hvzj2wx9">
   </a>
 </p>
 
