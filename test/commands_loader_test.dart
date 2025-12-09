@@ -5,12 +5,26 @@ import 'package:test/test.dart';
 
 void main() {
   late File yamlFile;
+  File? backupFile;
 
-  setUp(() => yamlFile = File('commands.yaml'));
+  setUp(() {
+    yamlFile = File('commands.yaml');
+    // Backup original commands.yaml if it exists
+    if (yamlFile.existsSync()) {
+      backupFile = File('commands.yaml.bak');
+      yamlFile.copySync(backupFile!.path);
+    }
+  });
 
   tearDown(() {
+    // Remove test-generated commands.yaml
     if (yamlFile.existsSync()) {
       yamlFile.deleteSync();
+    }
+    // Restore original commands.yaml if backup exists
+    if (backupFile != null && backupFile!.existsSync()) {
+      backupFile!.renameSync(yamlFile.path);
+      backupFile = null;
     }
   });
 
