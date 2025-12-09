@@ -1,7 +1,10 @@
 run:
   switch:
     docs:
-      script: cd website && npm run start
+      script: |
+        cd website
+        cp ../CHANGELOG.md ./src/pages/changelog.md
+        npm run start
     tests:
       script: |
         dart test --test-randomize-ordering-seed=random

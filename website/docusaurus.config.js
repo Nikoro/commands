@@ -51,6 +51,11 @@ const config = {
             position: 'right',
           },
           {
+            to: '/changelog',
+            label: 'Changelog',
+            position: 'right',
+          },
+          {
             href: 'https://github.com/Nikoro/commands_cli',
             label: 'GitHub',
             position: 'right',
