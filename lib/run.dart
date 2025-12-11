@@ -188,9 +188,9 @@ Future<void> run(String name, List<String> args) async {
 
           // Validate enum values
           if (param.isEnum && !param.isValidValue(value)) {
-            stderr.writeln('❌ Invalid value \'$value\' for parameter $bold$red$paramName$reset');
+            stderr.writeln('❌ Parameter $red$paramName$reset has invalid value: "$value"');
             final allowedValues = param.values!.map((v) => '$green$v$reset').join(', ');
-            stderr.writeln('💡 Allowed values: $allowedValues');
+            stderr.writeln('💡 Must be one of: $allowedValues');
             exit(1);
           }
 
@@ -225,29 +225,12 @@ Future<void> run(String name, List<String> args) async {
     }
   }
 
-  // Handle enum pickers for parameters without defaults and without provided values
-  // Check both required and optional params for enums that need picker
-  final allParams = [...resolvedCommand.requiredParams, ...resolvedCommand.optionalParams];
-  for (final param in allParams) {
-    // Only show picker if:
-    // 1. Parameter is an enum (has values)
-    // 2. No default value exists
-    // 3. No value has been provided yet
-    if (param.requiresEnumPicker && commandValues[param.name] == null) {
-      final selectedValue = EnumPicker.pick(param, param.name);
-
-      if (selectedValue == null) {
-        // User cancelled - exit gracefully
-        exit(0);
-      }
-
-      commandValues[param.name] = selectedValue;
-    }
-  }
-
   final missingPositional = <String>[];
   final missingNamed = <String>[];
 
+  // Process positional parameters FIRST (before enum picker)
+  // This ensures invalid values are caught and reported as errors
+  // instead of triggering the interactive picker
   final allPositionalParams = positionalParams + optionalPositionalParams;
   for (var i = 0; i < allPositionalParams.length; i++) {
     final paramName = allPositionalParams[i];
@@ -257,9 +240,9 @@ Future<void> run(String name, List<String> args) async {
 
       // Validate enum values
       if (param.isEnum && !param.isValidValue(value)) {
-        stderr.writeln('❌ Invalid value \'$value\' for parameter $bold$red$paramName$reset');
+        stderr.writeln('❌ Parameter $red$paramName$reset has invalid value: "$value"');
         final allowedValues = param.values!.map((v) => '$green$v$reset').join(', ');
-        stderr.writeln('💡 Allowed values: $allowedValues');
+        stderr.writeln('💡 Must be one of: $allowedValues');
         exit(1);
       }
 
@@ -289,6 +272,27 @@ Future<void> run(String name, List<String> args) async {
       commandValues[paramName] = value;
     } else if (commandValues[paramName] == null && positionalParams.contains(paramName)) {
       missingPositional.add(paramName);
+    }
+  }
+
+  // Handle enum pickers for parameters without defaults and without provided values
+  // Check both required and optional params for enums that need picker
+  // This runs AFTER positional processing to ensure invalid values are caught first
+  final allParams = [...resolvedCommand.requiredParams, ...resolvedCommand.optionalParams];
+  for (final param in allParams) {
+    // Only show picker if:
+    // 1. Parameter is an enum (has values)
+    // 2. No default value exists
+    // 3. No value has been provided yet
+    if (param.requiresEnumPicker && commandValues[param.name] == null) {
+      final selectedValue = EnumPicker.pick(param, param.name);
+
+      if (selectedValue == null) {
+        // User cancelled - exit gracefully
+        exit(0);
+      }
+
+      commandValues[param.name] = selectedValue;
     }
   }
 

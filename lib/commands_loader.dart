@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:commands_cli/colors.dart';
 import 'package:commands_cli/command.dart';
 import 'package:commands_cli/command_validator.dart';
 import 'package:commands_cli/param.dart';
@@ -656,8 +657,9 @@ Map<String, Command> loadCommandsFrom(File yaml) {
           final lowerDefault = defaultValue.toLowerCase();
           final isValid = values.any((v) => v.toLowerCase() == lowerDefault);
           if (!isValid) {
-            stderr.writeln('❌ Parameter "$currentParamName" has invalid default: "$defaultValue"');
-            stderr.writeln('💡 Must be one of: ${values.join(', ')}');
+            stderr.writeln('❌ Parameter $red$currentParamName$reset has invalid default: "$defaultValue"');
+            final greenValues = values.map((v) => '$green$v$reset').join(', ');
+            stderr.writeln('💡 Must be one of: $greenValues');
             exit(1);
           }
         }

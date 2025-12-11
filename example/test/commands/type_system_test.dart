@@ -77,8 +77,8 @@ void main() {
       expect(
         result.stderr,
         equals(
-          "❌ Invalid value 'invalid' for parameter ${bold}${red}env$reset\n"
-          "💡 Allowed values: ${green}dev$reset, ${green}staging$reset, ${green}prod$reset\n",
+          "❌ Parameter ${red}env$reset has invalid value: \"invalid\"\n"
+          "💡 Must be one of: ${green}dev$reset, ${green}staging$reset, ${green}prod$reset\n",
         ),
       );
       expect(result.exitCode, equals(1));
@@ -122,8 +122,8 @@ void main() {
       expect(
         result.stderr,
         equals(
-          "❌ Invalid value 'desktop' for parameter ${bold}${red}target$reset\n"
-          "💡 Allowed values: ${green}ios$reset, ${green}android$reset, ${green}web$reset\n",
+          "❌ Parameter ${red}target$reset has invalid value: \"desktop\"\n"
+          "💡 Must be one of: ${green}ios$reset, ${green}android$reset, ${green}web$reset\n",
         ),
       );
       expect(result.exitCode, equals(1));
@@ -243,8 +243,8 @@ void main() {
       expect(
         result.stderr,
         equals(
-          "❌ Invalid value 'invalid' for parameter ${bold}${red}env$reset\n"
-          "💡 Allowed values: ${green}dev$reset, ${green}staging$reset, ${green}prod$reset\n",
+          "❌ Parameter ${red}env$reset has invalid value: \"invalid\"\n"
+          "💡 Must be one of: ${green}dev$reset, ${green}staging$reset, ${green}prod$reset\n",
         ),
       );
       expect(result.exitCode, equals(1));
