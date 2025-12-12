@@ -208,5 +208,135 @@ void main() {
         expect(result.exitCode, equals(0));
       });
     }
+
+    for (String flag in ['--silent', '-s']) {
+      test('$flag suppresses all output when no errors/warnings to report', () async {
+        final result = await Process.run('commands', [flag]);
+
+        final output = result.stdout as String;
+
+        // Should NOT contain success messages (✅)
+        expect(output, isNot(contains('✅')));
+        // Should NOT contain warnings (⚠️) when not combined with exit flags
+        expect(output, isNot(contains('⚠️')));
+        // Should NOT contain errors (❌) when not combined with exit flags
+        expect(output, isNot(contains('❌')));
+
+        expect(result.exitCode, equals(0));
+      });
+    }
+
+    for (String flag in ['--exit-error', '-ee']) {
+      test('$flag exits with code 1 when errors exist', () async {
+        final result = await Process.run('commands', [flag]);
+
+        expect(result.exitCode, equals(1));
+
+        final output = result.stdout as String;
+
+        // Should still show the errors
+        expect(output, contains('❌'));
+      });
+    }
+
+    for (String flag in ['--exit-warning', '-ew']) {
+      test('$flag exits with code 1 when warnings exist', () async {
+        final result = await Process.run('commands', [flag]);
+
+        expect(result.exitCode, equals(1));
+
+        final output = result.stdout as String;
+
+        // Should show warnings and errors
+        expect(output, contains('⚠️'));
+        expect(output, contains('❌'));
+      });
+    }
+
+    test('--silent --exit-error shows only errors and exits', () async {
+      final result = await Process.run('commands', ['--silent', '--exit-error']);
+
+      final output = result.stdout as String;
+
+      // Should NOT contain success messages (✅)
+      expect(output, isNot(contains('✅')));
+
+      // Should NOT contain warnings (silent mode without --exit-warning)
+      expect(output, isNot(contains('⚠️')));
+
+      // Should show errors
+      expect(output, contains('❌'));
+
+      // Should exit with code 1
+      expect(result.exitCode, equals(1));
+    });
+
+    test('-s -ee shows only errors and exits', () async {
+      final result = await Process.run('commands', ['-s', '-ee']);
+
+      final output = result.stdout as String;
+
+      // Should NOT contain success messages (✅)
+      expect(output, isNot(contains('✅')));
+
+      // Should NOT contain warnings
+      expect(output, isNot(contains('⚠️')));
+
+      // Should show errors
+      expect(output, contains('❌'));
+
+      // Should exit with code 1
+      expect(result.exitCode, equals(1));
+    });
+
+    test('--silent --exit-warning shows errors and warnings and exits', () async {
+      final result = await Process.run('commands', ['--silent', '--exit-warning']);
+
+      final output = result.stdout as String;
+
+      // Should NOT contain success messages (✅)
+      expect(output, isNot(contains('✅')));
+
+      // Should show warnings
+      expect(output, contains('⚠️'));
+
+      // Should show errors
+      expect(output, contains('❌'));
+
+      // Should exit with code 1
+      expect(result.exitCode, equals(1));
+    });
+
+    test('-s -ew shows errors and warnings and exits', () async {
+      final result = await Process.run('commands', ['-s', '-ew']);
+
+      final output = result.stdout as String;
+
+      // Should NOT contain success messages (✅)
+      expect(output, isNot(contains('✅')));
+
+      // Should show warnings
+      expect(output, contains('⚠️'));
+
+      // Should show errors
+      expect(output, contains('❌'));
+
+      // Should exit with code 1
+      expect(result.exitCode, equals(1));
+    });
+
+    test('--help flag works with --silent', () async {
+      final result = await Process.run('commands', ['--help', '--silent']);
+
+      final output = result.stdout as String;
+
+      // Should show help output
+      expect(output, contains('Commands - CLI tool'));
+      expect(output, contains('--silent, -s'));
+      expect(output, contains('--exit-error, -ee'));
+      expect(output, contains('--exit-warning, -ew'));
+
+      expect(result.exitCode, equals(0));
+    });
   });
 }

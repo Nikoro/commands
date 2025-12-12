@@ -179,8 +179,13 @@ Future<void> main(List<String> args) async {
   final hasWarnings = reservedCommandKeys.isNotEmpty;
   final hasErrors = invalidCommandKeys.isNotEmpty || validationErrorKeys.isNotEmpty;
 
-  // Print success messages unless in silent mode
-  if (!silent) {
+  // Determine what to print based on silent and exit flags
+  final shouldPrintSuccess = !silent;
+  final shouldPrintWarnings = !silent || (silent && exitOnWarning);
+  final shouldPrintErrors = !silent || (silent && (exitOnError || exitOnWarning));
+
+  // Print success messages
+  if (shouldPrintSuccess) {
     allowedCommands.forEach((name, command) {
       final padding = ' ' * (maxNameLength - name.length + 1);
 
@@ -190,8 +195,8 @@ Future<void> main(List<String> args) async {
     });
   }
 
-  // Always print warnings (unless silent mode AND no errors)
-  if (!silent || (silent && hasErrors)) {
+  // Print warnings
+  if (shouldPrintWarnings) {
     for (final name in reservedCommandKeys) {
       final padding = ' ' * (maxNameLength - name.length + 1);
 
@@ -201,18 +206,20 @@ Future<void> main(List<String> args) async {
     }
   }
 
-  // Always print errors (even in silent mode)
-  for (final name in invalidCommandKeys) {
-    final padding = ' ' * (maxNameLength - name.length + 1);
+  // Print errors
+  if (shouldPrintErrors) {
+    for (final name in invalidCommandKeys) {
+      final padding = ' ' * (maxNameLength - name.length + 1);
 
-    print('❌ $bold$red$name$reset:${padding}contains invalid characters');
-  }
+      print('❌ $bold$red$name$reset:${padding}contains invalid characters');
+    }
 
-  for (final name in validationErrorKeys) {
-    final padding = ' ' * (maxNameLength - name.length + 1);
-    final error = commandValidationErrors[name] ?? 'validation error';
+    for (final name in validationErrorKeys) {
+      final padding = ' ' * (maxNameLength - name.length + 1);
+      final error = commandValidationErrors[name] ?? 'validation error';
 
-    print('❌ $bold$red$name$reset:$padding$error');
+      print('❌ $bold$red$name$reset:$padding$error');
+    }
   }
 
   await flushShellCache();
