@@ -15,12 +15,18 @@ void showHelp() {
     ('clean, --clean, -c', 'Remove all generated commands'),
   ];
 
-  final maxLength = options.map((o) => o.$1.length).reduce((a, b) => a > b ? a : b);
+  final flags = [
+    ('--silent, -s', 'Suppress success output (only show errors/warnings)'),
+    ('--exit-error, -ee', 'Exit with code 1 immediately on error'),
+    ('--exit-warning, -ew', 'Exit with code 1 immediately on error or warning'),
+  ];
+
+  final maxLength = [...options, ...flags].map((o) => o.$1.length).reduce((a, b) => a > b ? a : b);
 
   print('''
 ${bold}Commands - CLI tool for managing custom commands$reset
 
-${bold}Usage:$reset commands [option]
+${bold}Usage:$reset commands [option] [flags]
 
 ${bold}Options:$reset''');
 
@@ -29,9 +35,21 @@ ${bold}Options:$reset''');
     print('  $blue$option$reset$padding  $gray- $description$reset');
   }
 
+  print('\n${bold}Flags:$reset');
+
+  for (final (flag, description) in flags) {
+    final padding = ' ' * (maxLength - flag.length);
+    print('  $blue$flag$reset$padding  $gray- $description$reset');
+  }
+
   print('''
 
 ${bold}Default behavior:$reset
   Running ${blue}commands$reset without arguments will load and activate
-  all commands from commands.yaml in the current directory''');
+  all commands from commands.yaml in the current directory
+
+${bold}Examples:$reset
+  $blue commands --silent$reset              Activate commands without success output
+  $blue commands -s -ee$reset                Silent mode, exit on error
+  $blue commands --exit-warning$reset        Exit with error code if warnings occur''');
 }

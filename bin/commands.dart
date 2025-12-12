@@ -15,32 +15,42 @@ import 'package:commands_cli/shell_cache_flusher.dart';
 import 'package:commands_cli/commands_loader.dart';
 
 Future<void> main(List<String> args) async {
-  if (args.containsAny(['help', '--help', '-h'])) {
+  // Parse global flags
+  final silent = args.containsAny(['--silent', '-s']);
+  final exitOnError = args.containsAny(['--exit-error', '-ee']);
+  final exitOnWarning = args.containsAny(['--exit-warning', '-ew']);
+
+  // Remove flags from args for other processing
+  final cleanArgs = args.where((arg) =>
+    !['--silent', '-s', '--exit-error', '-ee', '--exit-warning', '-ew'].contains(arg)
+  ).toList();
+
+  if (cleanArgs.containsAny(['help', '--help', '-h'])) {
     showHelp();
     return;
   }
 
-  if (args.containsAny(['version', '--version', '-v'])) {
+  if (cleanArgs.containsAny(['version', '--version', '-v'])) {
     await showVersion();
     return;
   }
 
-  if (args.containsAny(['update', '--update', '-u'])) {
+  if (cleanArgs.containsAny(['update', '--update', '-u'])) {
     await handleUpdate();
     return;
   }
 
-  if (args.containsAny(['list', '--list', '-l'])) {
+  if (cleanArgs.containsAny(['list', '--list', '-l'])) {
     showList();
     return;
   }
 
-  if (args.contains('create')) {
-    await createCommandsYaml(args);
+  if (cleanArgs.contains('create')) {
+    await createCommandsYaml(cleanArgs);
     return;
   }
 
-  if (args.containsAnyCombo([
+  if (cleanArgs.containsAnyCombo([
     ['--watch-detached'],
     ['-wd'],
     ['-w-d'],
@@ -53,7 +63,7 @@ Future<void> main(List<String> args) async {
     return;
   }
 
-  if (args.containsAnyCombo([
+  if (cleanArgs.containsAnyCombo([
     ['--watch-kill'],
     ['-wk'],
     ['-w-k'],
@@ -66,7 +76,7 @@ Future<void> main(List<String> args) async {
     return;
   }
 
-  if (args.containsAnyCombo([
+  if (cleanArgs.containsAnyCombo([
     ['--watch-kill-all'],
     ['-wka'],
     ['-w-k-a'],
@@ -83,17 +93,17 @@ Future<void> main(List<String> args) async {
     return;
   }
 
-  if (args.containsAny(['watch', '--watch', '-w'])) {
+  if (cleanArgs.containsAny(['watch', '--watch', '-w'])) {
     await handleWatch();
     return;
   }
 
-  if (args.containsAny(['deactivate', '--deactivate', '-d'])) {
-    await handleDeactivate(args);
+  if (cleanArgs.containsAny(['deactivate', '--deactivate', '-d'])) {
+    await handleDeactivate(cleanArgs);
     return;
   }
 
-  if (args.containsAny(['clean', '--clean', '-c'])) {
+  if (cleanArgs.containsAny(['clean', '--clean', '-c'])) {
     await handleClean();
     return;
   }
@@ -165,22 +175,33 @@ Future<void> main(List<String> args) async {
 
   final maxNameLength = yamlContent.keys.map((name) => name.length).reduce((a, b) => a > b ? a : b);
 
-  allowedCommands.forEach((name, command) {
-    final padding = ' ' * (maxNameLength - name.length + 1);
+  // Track if we have warnings or errors
+  final hasWarnings = reservedCommandKeys.isNotEmpty;
+  final hasErrors = invalidCommandKeys.isNotEmpty || validationErrorKeys.isNotEmpty;
 
-    print(
-      '✅ $bold$green$name$reset:$padding$gray${command.description != null && command.description!.isNotEmpty ? (command.description!.endsWith('.') ? '${command.description} ' : '${command.description}. ') : ''}Type "$name --help" to learn more.$reset',
-    );
-  });
+  // Print success messages unless in silent mode
+  if (!silent) {
+    allowedCommands.forEach((name, command) {
+      final padding = ' ' * (maxNameLength - name.length + 1);
 
-  for (final name in reservedCommandKeys) {
-    final padding = ' ' * (maxNameLength - name.length + 1);
-
-    print(
-      '⚠️  $bold$yellow$name$reset:${padding}is a $bold${yellow}reserved$reset command. ${gray}In order to override it see: ${link('README', 'https://github.com/Nikoro/commands/blob/main/README.md#overriding-existing-commands')}$reset',
-    );
+      print(
+        '✅ $bold$green$name$reset:$padding$gray${command.description != null && command.description!.isNotEmpty ? (command.description!.endsWith('.') ? '${command.description} ' : '${command.description}. ') : ''}Type "$name --help" to learn more.$reset',
+      );
+    });
   }
 
+  // Always print warnings (unless silent mode AND no errors)
+  if (!silent || (silent && hasErrors)) {
+    for (final name in reservedCommandKeys) {
+      final padding = ' ' * (maxNameLength - name.length + 1);
+
+      print(
+        '⚠️  $bold$yellow$name$reset:${padding}is a $bold${yellow}reserved$reset command. ${gray}In order to override it see: ${link('README', 'https://github.com/Nikoro/commands/blob/main/README.md#overriding-existing-commands')}$reset',
+      );
+    }
+  }
+
+  // Always print errors (even in silent mode)
   for (final name in invalidCommandKeys) {
     final padding = ' ' * (maxNameLength - name.length + 1);
 
@@ -195,4 +216,13 @@ Future<void> main(List<String> args) async {
   }
 
   await flushShellCache();
+
+  // Handle exit-on-error and exit-on-warning flags
+  if (exitOnError && hasErrors) {
+    exit(1);
+  }
+
+  if (exitOnWarning && (hasErrors || hasWarnings)) {
+    exit(1);
+  }
 }

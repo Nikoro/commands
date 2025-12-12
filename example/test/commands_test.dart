@@ -155,7 +155,7 @@ void main() {
           equals(
             '${bold}Commands - CLI tool for managing custom commands$reset\n'
             '\n'
-            '${bold}Usage:$reset commands [option]\n'
+            '${bold}Usage:$reset commands [option] [flags]\n'
             '\n'
             '${bold}Options:$reset\n'
             '  ${blue}help, --help, -h$reset                        ${gray}- Display this help message$reset\n'
@@ -170,9 +170,19 @@ void main() {
             '  ${blue}deactivate, --deactivate, -d [command]$reset  ${gray}- Deactivate commands package or specific commands$reset\n'
             '  ${blue}clean, --clean, -c$reset                      ${gray}- Remove all generated commands$reset\n'
             '\n'
+            '${bold}Flags:$reset\n'
+            '  ${blue}--silent, -s$reset                            ${gray}- Suppress success output (only show errors/warnings)$reset\n'
+            '  ${blue}--exit-error, -ee$reset                       ${gray}- Exit with code 1 immediately on error$reset\n'
+            '  ${blue}--exit-warning, -ew$reset                     ${gray}- Exit with code 1 immediately on error or warning$reset\n'
+            '\n'
             '${bold}Default behavior:$reset\n'
             '  Running ${blue}commands$reset without arguments will load and activate\n'
-            '  all commands from commands.yaml in the current directory\n',
+            '  all commands from commands.yaml in the current directory\n'
+            '\n'
+            '${bold}Examples:$reset\n'
+            '  ${blue}commands --silent$reset              Activate commands without success output\n'
+            '  ${blue}commands -s -ee$reset                Silent mode, exit on error\n'
+            '  ${blue}commands --exit-warning$reset        Exit with error code if warnings occur\n',
           ),
         );
 
