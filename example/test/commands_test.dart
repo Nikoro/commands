@@ -244,76 +244,54 @@ void main() {
       });
     }
 
-    test('--silent --exit-error shows only errors and exits', () async {
-      final result = await Process.run('commands', ['--silent', '--exit-error']);
+    for (List<String> combo in [
+      ['--silent', '--exit-error'],
+      ['--silent', '-ee'],
+      ['-s', '-ee'],
+      ['-s', '--exit-error']
+    ]) {
+      test('${combo.join(' ')} shows only errors and exits', () async {
+        final result = await Process.run('commands', combo);
 
-      final output = result.stdout as String;
+        final output = result.stdout as String;
 
-      // Should NOT contain success messages (✅)
-      expect(output, isNot(allOf(contains('✅'), contains('$green'))));
+        // Should NOT contain success messages
+        expect(output, isNot(allOf(contains('✅'), contains('$green'))));
 
-      // Should NOT contain warnings (silent mode without --exit-warning)
-      expect(output, isNot(allOf(contains('⚠️'), contains('$yellow'))));
+        // Should NOT contain warnings (silent mode without --exit-warning)
+        expect(output, isNot(allOf(contains('⚠️'), contains('$yellow'))));
 
-      // Should show errors
-      expect(output, allOf(contains('❌'), contains('$red')));
+        // Should show errors
+        expect(output, allOf(contains('❌'), contains('$red')));
 
-      // Should exit with code 1
-      expect(result.exitCode, equals(1));
-    });
+        // Should exit with code 1
+        expect(result.exitCode, equals(1));
+      });
+    }
+    for (List<String> combo in [
+      ['--silent', '--exit-warning'],
+      ['--silent', '-ew'],
+      ['-s', '-ew'],
+      ['-s', '--exit-warning']
+    ]) {
+      test('${combo.join(' ')} shows errors and warnings and exits', () async {
+        final result = await Process.run('commands', combo);
 
-    test('-s -ee shows only errors and exits', () async {
-      final result = await Process.run('commands', ['-s', '-ee']);
+        final output = result.stdout as String;
 
-      final output = result.stdout as String;
+        // Should NOT contain success messages
+        expect(output, isNot(allOf(contains('✅'), contains('$green'))));
 
-      // Should NOT contain success messages (✅)
-      expect(output, isNot(allOf(contains('✅'), contains('$green'))));
+        // Should show warnings
+        expect(output, allOf(contains('⚠️'), contains('$yellow')));
 
-      // Should NOT contain warnings
-      expect(output, isNot(allOf(contains('⚠️'), contains('$yellow'))));
+        // Should show errors
+        expect(output, allOf(contains('❌'), contains('$red')));
 
-      // Should show errors
-      expect(output, allOf(contains('❌'), contains('$red')));
+        // Should exit with code 1
+        expect(result.exitCode, equals(1));
+      });
+    }
 
-      // Should exit with code 1
-      expect(result.exitCode, equals(1));
-    });
-
-    test('--silent --exit-warning shows errors and warnings and exits', () async {
-      final result = await Process.run('commands', ['--silent', '--exit-warning']);
-
-      final output = result.stdout as String;
-
-      // Should NOT contain success messages (✅)
-      expect(output, isNot(allOf(contains('✅'), contains('$green'))));
-
-      // Should show warnings
-      expect(output, allOf(contains('⚠️'), contains('$yellow')));
-
-      // Should show errors
-      expect(output, allOf(contains('❌'), contains('$red')));
-
-      // Should exit with code 1
-      expect(result.exitCode, equals(1));
-    });
-
-    test('-s -ew shows errors and warnings and exits', () async {
-      final result = await Process.run('commands', ['-s', '-ew']);
-
-      final output = result.stdout as String;
-
-      // Should NOT contain success messages (✅)
-      expect(output, isNot(allOf(contains('✅'), contains('$green'))));
-
-      // Should show warnings
-      expect(output, allOf(contains('⚠️'), contains('$yellow')));
-
-      // Should show errors
-      expect(output, allOf(contains('❌'), contains('$red')));
-
-      // Should exit with code 1
-      expect(result.exitCode, equals(1));
-    });
   });
 }
