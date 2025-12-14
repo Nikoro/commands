@@ -1,7 +1,9 @@
 import 'dart:io';
 
+import 'package:commands_cli/installation_source.dart';
+
 /// Returns true if the pubspec was modified
-bool writePubspec(Directory projectDir, Iterable<String> newKeys) {
+Future<bool> writePubspec(Directory projectDir, Iterable<String> newKeys) async {
   final pubspecFile = File('${projectDir.path}/pubspec.yaml');
 
   // Collect existing executables if pubspec.yaml exists
@@ -28,6 +30,10 @@ bool writePubspec(Directory projectDir, Iterable<String> newKeys) {
   // Build executables block
   final executables = allKeys.map((k) => '  $k: $k').join('\n');
 
+  // Detect installation source and build dependency block
+  final installationInfo = await detectInstallationSource();
+  final dependencyBlock = _buildDependencyBlock(installationInfo);
+
   // Write new pubspec.yaml (override fully)
   final content = '''
 name: generated_commands
@@ -37,9 +43,7 @@ environment:
   sdk: ^3.0.0
 
 dev_dependencies:
-  commands_cli:
-    git:
-      url: https://github.com/Nikoro/commands_cli.git
+$dependencyBlock
 
 executables:
 $executables
@@ -52,4 +56,30 @@ $executables
 
   pubspecFile.writeAsStringSync(content);
   return true;
+}
+
+String _buildDependencyBlock(InstallationInfo info) {
+  if (info.source == InstallationSource.git) {
+    // Build git dependency
+    final buffer = StringBuffer();
+    buffer.writeln('  commands_cli:');
+    buffer.writeln('    git:');
+    buffer.write('      url: ${info.gitUrl ?? 'https://github.com/Nikoro/commands_cli.git'}');
+
+    // Add git ref if available
+    if (info.gitRef != null) {
+      buffer.writeln();
+      buffer.write('      ref: ${info.gitRef}');
+    }
+
+    return buffer.toString();
+  } else {
+    // Build hosted (pub.dev) dependency
+    if (info.version != null) {
+      return '  commands_cli: ^${info.version}';
+    } else {
+      // Fallback if version couldn't be detected
+      return '  commands_cli: any';
+    }
+  }
 }

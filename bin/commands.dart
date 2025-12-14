@@ -142,7 +142,7 @@ Future<void> main(List<String> args) async {
         !reservedCommandKeys.contains(e.key)),
   );
 
-  final pubspecModified = writePubspec(GeneratedCommands.dir, allowedCommands.keys);
+  final pubspecModified = await writePubspec(GeneratedCommands.dir, allowedCommands.keys);
   final binFilesModified = writeBinFiles(GeneratedCommands.binDir, allowedCommands.keys);
 
   // Check current activation status and existing snapshots BEFORE any activation

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:commands_cli/colors.dart';
+import 'package:commands_cli/installation_source.dart';
 
 Future<void> handleUpdate() async {
   final isGlobalExecution = Platform.script.toFilePath().contains('.pub-cache/global_packages');
@@ -9,9 +10,9 @@ Future<void> handleUpdate() async {
 
   if (isGlobalExecution) {
     // Determine if installed from git or pub.dev
-    final installationSource = await _detectInstallationSource();
+    final installationInfo = await detectInstallationSource();
 
-    if (installationSource == InstallationSource.git) {
+    if (installationInfo.source == InstallationSource.git) {
       // Update from git repository
       print('${bold}Updating global commands_cli package from git...$reset\n');
       result = await Process.run(
@@ -52,46 +53,5 @@ Future<void> handleUpdate() async {
     print('$red✗ Update failed:$reset');
     print(result.stderr);
     exit(1);
-  }
-}
-
-enum InstallationSource {
-  git,
-  hosted,
-}
-
-Future<InstallationSource> _detectInstallationSource() async {
-  try {
-    final home = Platform.environment['HOME'] ?? Platform.environment['USERPROFILE'];
-    if (home == null) return InstallationSource.hosted;
-
-    final pubspecLockPath = '$home/.pub-cache/global_packages/commands_cli/pubspec.lock';
-    final pubspecLockFile = File(pubspecLockPath);
-
-    if (!await pubspecLockFile.exists()) {
-      return InstallationSource.hosted;
-    }
-
-    final content = await pubspecLockFile.readAsString();
-
-    // Parse the pubspec.lock to find the commands_cli package entry
-    // Look for the source field which will be either "git" or "hosted"
-    final commandsCliSection = RegExp(
-      r'commands_cli:.*?source:\s*(\w+)',
-      dotAll: true,
-    ).firstMatch(content);
-
-    if (commandsCliSection != null) {
-      final source = commandsCliSection.group(1);
-      if (source == 'git') {
-        return InstallationSource.git;
-      }
-    }
-
-    // Default to hosted (pub.dev)
-    return InstallationSource.hosted;
-  } catch (e) {
-    // If we can't detect, assume hosted (pub.dev)
-    return InstallationSource.hosted;
   }
 }
