@@ -51,13 +51,10 @@ Future<void> handleUpdate() async {
       'already using',
     ]);
 
-    // Temporary: always run regenerate for testing
-    const forceRegenerate = true;
-
-    if (alreadyUpToDate && !forceRegenerate) {
+    if (alreadyUpToDate) {
       print('$bold$blue Already up to date!$reset');
     } else {
-      print('$bold$green✓ Successfully updated!$reset\n');
+      print('$bold$green✅ Successfully updated!$reset\n');
 
       // Regenerate commands after update
       final regenerateProcess = await Process.start(
