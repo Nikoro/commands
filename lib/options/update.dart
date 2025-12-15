@@ -55,11 +55,15 @@ Future<void> handleUpdate() async {
       print('$bold$green✓ Successfully updated!$reset\n');
 
       // Regenerate commands after update
-      await Process.run(
+      final regenerateResult = await Process.run(
         'commands',
         ['regenerate'],
         runInShell: true,
       );
+      print(regenerateResult.stdout);
+      if (regenerateResult.exitCode != 0) {
+        print(regenerateResult.stderr);
+      }
     }
   } else {
     print('$red✗ Update failed:$reset');

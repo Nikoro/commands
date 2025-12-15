@@ -43,11 +43,14 @@ Future<int> activatePackage(Directory projectDir) async {
   return result.exitCode;
 }
 
-Future<void> warmUpCommands(Iterable keys) async {
+Future<void> warmUpCommands(Iterable keys, {void Function(int current, int total)? onProgress}) async {
   // Sequential execution required for proper snapshot creation
   // Parallel execution interferes with Dart's compilation caching
-  for (final name in keys) {
+  final commandsList = keys.toList();
+  for (var i = 0; i < commandsList.length; i++) {
+    final name = commandsList[i];
     await Process.run('dart', ['pub', 'global', 'run', 'generated_commands:$name', '--help'], runInShell: true);
+    onProgress?.call(i + 1, commandsList.length);
   }
 }
 

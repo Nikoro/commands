@@ -19,8 +19,6 @@ Future<void> handleRegenerate() async {
     exit(0);
   }
 
-  print('🔄 Regenerating ${commands.length} command${commands.length > 1 ? 's' : ''}...');
-
   // Step 2: Perform clean (same as handleClean but without deleting GeneratedCommands)
   await killAllWatchers(silent: true);
   await Process.run('dart', ['pub', 'global', 'deactivate', 'generated_commands'], runInShell: true);
@@ -42,7 +40,13 @@ Future<void> handleRegenerate() async {
   }
 
   // Step 7: Warm up all commands to create snapshots
-  await warmUpCommands(commands);
+  final commandText = '🔄 Regenerating ${commands.length} command${commands.length > 1 ? 's' : ''}';
+  stdout.write('$commandText - ${gray}0%$reset');
+  await warmUpCommands(commands, onProgress: (current, total) {
+    final percentage = ((current / total) * 100).round();
+    stdout.write('\r$commandText - $gray$percentage%$reset');
+  });
+  stdout.writeln(); // Move to next line after progress complete
 
   // Step 8: Reactivate after warmup to register snapshots
   await activatePackage(GeneratedCommands.dir);
