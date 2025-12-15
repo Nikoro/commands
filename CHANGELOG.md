@@ -1,3 +1,9 @@
+## 0.3.2 - 2025-12-15
+
+### Fixed
+- Stream regenerate output in real-time for update command
+
+---
 ## 0.3.1 - 2025-12-15
 
 ### Added
