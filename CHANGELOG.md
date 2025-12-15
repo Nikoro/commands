@@ -1,4 +1,12 @@
+## 0.3.1 - 2025-12-15
 
+### Added
+- Progress percentage indicator during warmup and regeneration
+
+### Fixed
+- Keep cursor on new line during progress updates in regenerate
+
+---
 ## 0.3.0 - 2025-12-15
 
 ### Added
@@ -25,15 +33,6 @@
 ### Documentation
 - Expanded AGENTS.md and CLAUDE.md with commit and workflow rules
 - Clarified help and option descriptions
-
-### Deprecated
-- Nothing deprecated in this release
-
-### Removed
-- Nothing removed in this release
-
-### Security
-- No security fixes in this release
 
 ---
 ## 0.2.1 - 2024-12-08
