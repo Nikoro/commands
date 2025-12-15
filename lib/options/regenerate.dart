@@ -41,12 +41,11 @@ Future<void> handleRegenerate() async {
 
   // Step 7: Warm up all commands to create snapshots
   final commandText = '🔄 Regenerating ${commands.length} command${commands.length > 1 ? 's' : ''}';
-  stdout.write('$commandText - ${gray}0%$reset');
+  print('$commandText - ${gray}0%$reset');
   await warmUpCommands(commands, onProgress: (current, total) {
     final percentage = ((current / total) * 100).round();
-    stdout.write('\r$commandText - $gray$percentage%$reset');
+    stdout.write('\x1b[1A\r$commandText - $gray$percentage%$reset\n');
   });
-  stdout.writeln(); // Move to next line after progress complete
 
   // Step 8: Reactivate after warmup to register snapshots
   await activatePackage(GeneratedCommands.dir);
