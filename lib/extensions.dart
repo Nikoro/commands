@@ -22,3 +22,7 @@ extension ListStringExtensions on List<String> {
   bool containsAny(List<String> values) => values.any(contains);
   bool containsAnyCombo(List<List<String>> combos) => combos.any((combo) => combo.every(contains));
 }
+
+extension StringExtensions on String {
+  bool containsAny(List<String> values) => values.any(contains);
+}

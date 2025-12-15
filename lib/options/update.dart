@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:commands_cli/colors.dart';
+import 'package:commands_cli/extensions.dart';
 import 'package:commands_cli/installation_source.dart';
 
 Future<void> handleUpdate() async {
@@ -44,10 +45,21 @@ Future<void> handleUpdate() async {
     print(output);
 
     // Check if already up to date
-    if (output.contains('is already active') || output.contains('already using')) {
+    if (output.containsAny([
+      'already activated at newest available version',
+      'is already active',
+      'already using',
+    ])) {
       print('$bold$blue Already up to date!$reset');
     } else {
-      print('$bold$green✓ Successfully updated!$reset');
+      print('$bold$green✓ Successfully updated!$reset\n');
+
+      // Regenerate commands after update
+      await Process.run(
+        'commands',
+        ['regenerate'],
+        runInShell: true,
+      );
     }
   } else {
     print('$red✗ Update failed:$reset');
