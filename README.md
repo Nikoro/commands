@@ -170,7 +170,7 @@ While `Makefile` is a powerful and widely used tool, [`commands_cli`](https://pu
 4.  **Activate your defined commands:**
 
     <pre><code class="language-sh">$ commands
-    ✅ <span style="color:#C9E2AF;font-weight:bold;">hello</span>: <span style="color:#808997;">Prints "Hello {message}"</span></code></pre>
+    ✅ <span style="color:#C9E2AF;font-weight:bold;">hello</span>: <span style="color:#808997;">Prints "Hello {message}". Type "hello --help" to learn more.</span></code></pre>
 
 5. **Run your defined commands:** 
 
@@ -226,7 +226,7 @@ hello:
 **Activate your defined commands:**
 
   <pre><code class="language-sh">$ commands
-✅ <span style="color:#C9E2AF;font-weight:bold;">hello</span></code></pre>
+✅ <span style="color:#C9E2AF;font-weight:bold;">hello</span>: <span style="color:#808997;">Type "hello --help" to learn more.</span></code></pre>
 
 **Run:**
 
@@ -252,8 +252,7 @@ greet:
 **Activate your defined commands:**
 
   <pre><code class="language-sh">$ commands
-✅ <span style="color:#C9E2AF;font-weight:bold;">greet</span></code></pre>
-
+✅ <span style="color:#C9E2AF;font-weight:bold;">greet</span>: <span style="color:#808997;">Type "greet --help" to learn more.</span></code></pre>
 
 **Run:**
 
@@ -283,8 +282,7 @@ greet:
 **Activate your defined commands:**
 
   <pre><code class="language-sh">$ commands
-✅ <span style="color:#C9E2AF;font-weight:bold;">greet</span></code></pre>
-
+✅ <span style="color:#C9E2AF;font-weight:bold;">greet</span>: <span style="color:#808997;">Type "greet --help" to learn more.</span></code></pre>
 
 **Run:**
 
@@ -315,8 +313,7 @@ goodbye:
 **Activate your defined commands:**
 
   <pre><code class="language-sh">$ commands
-✅ <span style="color:#C9E2AF;font-weight:bold;">goodbye</span></code></pre>
-
+✅ <span style="color:#C9E2AF;font-weight:bold;">goodbye</span>: <span style="color:#808997;">Type "goodbye --help" to learn more.</span></code></pre>
 
 **Run:**
 
@@ -348,8 +345,7 @@ This allows you to create concise aliases while still keeping the flexibility to
 **Activate your defined commands:**
 
   <pre><code class="language-sh">$ commands
-✅ <span style="color:#C9E2AF;font-weight:bold;">d</span>: <span style="color:#808997;">dart alias</span></code></pre>
-
+✅ <span style="color:#C9E2AF;font-weight:bold;">d</span>: <span style="color:#808997;">dart alias. Type "d --help" to learn more.</span></code></pre>
 
 **Run:**
 
@@ -372,7 +368,7 @@ analyze: ## dart analyze
 **Activate your defined commands:**
 
   <pre><code class="language-sh">$ commands
-✅ <span style="color:#C9E2AF;font-weight:bold;">analyze</span>: <span style="color:#808997;">dart analyze</span></code></pre>
+✅ <span style="color:#C9E2AF;font-weight:bold;">analyze</span>: <span style="color:#808997;">dart analyze. Type "analyze --help" to learn more.</span></code></pre>
 
 
 **Run:**
@@ -531,7 +527,7 @@ build: ## Build application
 **Activate your defined commands:**
 
   <pre><code class="language-sh">$ commands
-✅ <span style="color:#C9E2AF;font-weight:bold;">build</span>: <span style="color:#808997;">Build application</span></code></pre>
+✅ <span style="color:#C9E2AF;font-weight:bold;">build</span>: <span style="color:#808997;">Build application. Type "build --help" to learn more.</span></code></pre>
 
 **Run:**
 
@@ -703,7 +699,7 @@ ls: ## custom ls
 **Activate your defined commands:**
 
   <pre><code class="language-sh">$ commands
-✅ <span style="color:#C9E2AF;font-weight:bold;">ls</span>: <span style="color:#808997;">custom ls</span></code></pre>
+✅ <span style="color:#C9E2AF;font-weight:bold;">ls</span>: <span style="color:#808997;">custom ls. Type "ls --help" to learn more.</span></code></pre>
 
 **Run:**
 
@@ -758,8 +754,8 @@ which: ## custom which
 **Activate your defined commands:**
 
   <pre><code class="language-sh">$ commands
-✅ <span style="color:#C9E2AF;font-weight:bold;">test</span>: <span style="color:#808997;">custom test</span>
-✅ <span style="color:#C9E2AF;font-weight:bold;">which</span>: <span style="color:#808997;">custom which</span></code></pre>
+✅ <span style="color:#C9E2AF;font-weight:bold;">test</span>: <span style="color:#808997;">custom test. Type "test --help" to learn more.</span>
+✅ <span style="color:#C9E2AF;font-weight:bold;">which</span>: <span style="color:#808997;">custom which. Type "which --help" to learn more.</span></code></pre>
 
 **Run:**
 
