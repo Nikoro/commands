@@ -556,9 +556,13 @@ Map<String, Command> loadCommandsFrom(File yaml) {
       // Validate type value
       const validTypes = ['boolean', 'string', 'int', 'double'];
       if (!validTypes.contains(typeValue)) {
-        stderr.writeln(
-            '❌ Invalid type "$typeValue" for parameter "$currentParamName". Must be one of: ${validTypes.join(', ')}');
-        exit(1);
+        if (currentCommand != null) {
+          _validationErrors[currentCommand] =
+              'Invalid type "$typeValue" for parameter "$currentParamName". Must be one of: ${validTypes.join(', ')}';
+        }
+        currentParamName = null;
+        currentParamMetadata = {};
+        continue;
       }
 
       currentParamMetadata['type'] = typeValue;
@@ -586,8 +590,12 @@ Map<String, Command> loadCommandsFrom(File yaml) {
           .toList();
 
       if (valuesList.isEmpty) {
-        stderr.writeln('❌ Parameter "$currentParamName" has empty values list');
-        exit(1);
+        if (currentCommand != null) {
+          _validationErrors[currentCommand] = 'Parameter "$currentParamName" has empty values list';
+        }
+        currentParamName = null;
+        currentParamMetadata = {};
+        continue;
       }
 
       currentParamMetadata['values'] = valuesList;
@@ -659,9 +667,13 @@ Map<String, Command> loadCommandsFrom(File yaml) {
 
         // Validation: boolean type with non-boolean default
         if (effectiveType == 'boolean' && defaultValue != 'true' && defaultValue != 'false') {
-          stderr.writeln('❌ Parameter "$currentParamName" has invalid default: "$defaultValue"');
-          stderr.writeln('💡 Boolean parameters must have default: true or false');
-          exit(1);
+          if (currentCommand != null) {
+            _validationErrors[currentCommand] =
+                'Parameter $bold$red$currentParamName$reset has invalid default: "$defaultValue"\n💡 Boolean parameters must have default: true or false';
+          }
+          currentParamName = null;
+          currentParamMetadata = {};
+          continue;
         }
 
         // Validation: typed enum values - ensure all values match the explicit type
@@ -691,25 +703,37 @@ Map<String, Command> loadCommandsFrom(File yaml) {
           final lowerDefault = defaultValue.toLowerCase();
           final isValid = values.any((v) => v.toLowerCase() == lowerDefault);
           if (!isValid) {
-            stderr.writeln('❌ Parameter $red$currentParamName$reset has invalid default: "$defaultValue"');
-            final greenValues = values.map((v) => '$green$v$reset').join(', ');
-            stderr.writeln('💡 Must be one of: $greenValues');
-            exit(1);
+            if (currentCommand != null) {
+              final greenValues = values.map((v) => '$green$v$reset').join(', ');
+              _validationErrors[currentCommand] =
+                  'Parameter $bold$red$currentParamName$reset has invalid default: "$defaultValue"\n💡 Must be one of: $greenValues';
+            }
+            currentParamName = null;
+            currentParamMetadata = {};
+            continue;
           }
         }
 
         // Validation: numeric types with default (skip if explicitly string type)
         // Use EnumTypeValidator for consistency with typed enums
         if (effectiveType == 'int' && type == 'int' && !EnumTypeValidator.isValidInt(defaultValue)) {
-          stderr.writeln('❌ Parameter "$currentParamName" has invalid default: "$defaultValue"');
-          stderr.writeln('💡 Integer parameters must have a valid integer default');
-          exit(1);
+          if (currentCommand != null) {
+            _validationErrors[currentCommand] =
+                'Parameter $bold$red$currentParamName$reset has invalid default: "$defaultValue"\n💡 Integer parameters must have a valid integer default';
+          }
+          currentParamName = null;
+          currentParamMetadata = {};
+          continue;
         }
 
         if (effectiveType == 'double' && type == 'double' && !EnumTypeValidator.isValidDouble(defaultValue)) {
-          stderr.writeln('❌ Parameter "$currentParamName" has invalid default: "$defaultValue"');
-          stderr.writeln('💡 Numeric parameters must have a valid number default');
-          exit(1);
+          if (currentCommand != null) {
+            _validationErrors[currentCommand] =
+                'Parameter $bold$red$currentParamName$reset has invalid default: "$defaultValue"\n💡 Numeric parameters must have a valid number default';
+          }
+          currentParamName = null;
+          currentParamMetadata = {};
+          continue;
         }
 
         final updated = Param(
