@@ -63,6 +63,17 @@ Map<String, Command> loadCommandsFrom(File yaml) {
     // Boolean type inference only if no type and no default explicitly set
     String? effectiveType = type;
 
+    // Validate enum values against explicit type (only if type is explicitly set)
+    if (type != null && values != null && values.isNotEmpty && currentParamMetadata['isTypeExplicit'] == true) {
+      final enumValidation = EnumTypeValidator.validateEnumValues(currentParamName, type, values);
+      if (!enumValidation.isValid && currentCommand != null) {
+        _validationErrors[currentCommand] = enumValidation.errorMessage ?? 'validation error';
+        currentParamName = null;
+        currentParamMetadata = {};
+        return;
+      }
+    }
+
     // If type, values, or default were specified, rebuild the param
     if (type != null || values != null || defaultValue != null) {
       final updated = Param(
@@ -652,6 +663,28 @@ Map<String, Command> loadCommandsFrom(File yaml) {
           exit(1);
         }
 
+        // Validation: typed enum values - ensure all values match the explicit type
+        if (type != null && values != null && values.isNotEmpty && currentParamMetadata['isTypeExplicit'] == true) {
+          final enumValidation = EnumTypeValidator.validateEnumValues(currentParamName, type, values);
+          if (!enumValidation.isValid && currentCommand != null) {
+            _validationErrors[currentCommand] = enumValidation.errorMessage ?? 'validation error';
+            currentParamName = null;
+            currentParamMetadata = {};
+            continue;
+          }
+        }
+
+        // Validation: typed enum default - ensure default matches the explicit type
+        if (type != null && values != null && values.isNotEmpty && currentParamMetadata['isTypeExplicit'] == true) {
+          final enumDefaultValidation = EnumTypeValidator.validateEnumDefault(currentParamName, type, defaultValue, values);
+          if (!enumDefaultValidation.isValid && currentCommand != null) {
+            _validationErrors[currentCommand] = enumDefaultValidation.errorMessage ?? 'validation error';
+            currentParamName = null;
+            currentParamMetadata = {};
+            continue;
+          }
+        }
+
         // Validation: enum with default - ensure default is in values list
         if (values != null && values.isNotEmpty) {
           final lowerDefault = defaultValue.toLowerCase();
@@ -665,13 +698,14 @@ Map<String, Command> loadCommandsFrom(File yaml) {
         }
 
         // Validation: numeric types with default (skip if explicitly string type)
-        if (effectiveType == 'int' && type == 'int' && int.tryParse(defaultValue) == null) {
+        // Use EnumTypeValidator for consistency with typed enums
+        if (effectiveType == 'int' && type == 'int' && !EnumTypeValidator.isValidInt(defaultValue)) {
           stderr.writeln('❌ Parameter "$currentParamName" has invalid default: "$defaultValue"');
           stderr.writeln('💡 Integer parameters must have a valid integer default');
           exit(1);
         }
 
-        if (effectiveType == 'double' && type == 'double' && double.tryParse(defaultValue) == null) {
+        if (effectiveType == 'double' && type == 'double' && !EnumTypeValidator.isValidDouble(defaultValue)) {
           stderr.writeln('❌ Parameter "$currentParamName" has invalid default: "$defaultValue"');
           stderr.writeln('💡 Numeric parameters must have a valid number default');
           exit(1);

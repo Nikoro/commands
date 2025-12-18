@@ -169,3 +169,118 @@ class ValidationResult {
     return buffer.toString().trimRight();
   }
 }
+
+/// Validates enum values against an explicit type
+class EnumTypeValidator {
+  /// Checks if a value is a valid integer
+  static bool isValidInt(String value) {
+    // First check if it's a valid integer directly
+    if (int.tryParse(value) != null) return true;
+
+    // Also accept doubles that are whole numbers (e.g., "2.0")
+    final doubleVal = double.tryParse(value);
+    if (doubleVal != null && doubleVal == doubleVal.truncateToDouble()) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /// Checks if a value is a valid double (including integers)
+  static bool isValidDouble(String value) {
+    return double.tryParse(value) != null;
+  }
+
+  /// Gets the detected type of a value as a display string
+  static String getValueType(String value) {
+    // Check for integer first (no decimal point)
+    if (int.tryParse(value) != null && !value.contains('.')) {
+      return 'integer';
+    }
+
+    // Check for double (has decimal point or is parseable as double)
+    if (double.tryParse(value) != null) {
+      return 'double';
+    }
+
+    return 'string';
+  }
+
+  /// Validates enum values against the specified type
+  ///
+  /// Returns a ValidationResult with error details if any values don't match the type.
+  /// If type is null or 'string', all values are valid.
+  static ValidationResult validateEnumValues(
+    String? paramName,
+    String? type,
+    List<String>? values,
+  ) {
+    if (type == null || type == 'string' || values == null || values.isEmpty) {
+      return ValidationResult.success();
+    }
+
+    final invalidValues = <String, String>{};
+
+    for (final value in values) {
+      if (type == 'int') {
+        if (!isValidInt(value)) {
+          invalidValues[value] = getValueType(value);
+        }
+      } else if (type == 'double') {
+        if (!isValidDouble(value)) {
+          invalidValues[value] = getValueType(value);
+        }
+      }
+    }
+
+    if (invalidValues.isEmpty) {
+      return ValidationResult.success();
+    }
+
+    // Build error message with all invalid values
+    final typeName = type == 'int' ? 'integer' : type;
+    final gotParts = invalidValues.entries.map((e) => '"${e.key}" $gray[${e.value}]$reset').join(', ');
+
+    return ValidationResult.error(
+      'Parameter $bold$red$paramName$reset expects an $gray[$typeName]$reset\n      Got: $gotParts',
+      hint: '${typeName.substring(0, 1).toUpperCase()}${typeName.substring(1)} parameters must have valid $typeName values',
+    );
+  }
+
+  /// Validates that an enum's default value matches the specified type
+  ///
+  /// Returns a ValidationResult with error details if the default doesn't match.
+  static ValidationResult validateEnumDefault(
+    String? paramName,
+    String? type,
+    String? defaultValue,
+    List<String>? values,
+  ) {
+    if (type == null || type == 'string' || defaultValue == null) {
+      return ValidationResult.success();
+    }
+
+    bool isValidType = false;
+    if (type == 'int') {
+      isValidType = isValidInt(defaultValue);
+    } else if (type == 'double') {
+      isValidType = isValidDouble(defaultValue);
+    }
+
+    if (isValidType) {
+      return ValidationResult.success();
+    }
+
+    final typeName = type == 'int' ? 'integer' : type;
+    final hint = StringBuffer('${typeName.substring(0, 1).toUpperCase()}${typeName.substring(1)} parameters must have a valid $typeName default');
+
+    if (values != null && values.isNotEmpty) {
+      hint.write('\n💡 Must be one of: ${values.join(', ')}');
+    }
+
+    return ValidationResult.error(
+      'Parameter $bold$red$paramName$reset has invalid default: "$defaultValue"',
+      hint: hint.toString(),
+    );
+  }
+}

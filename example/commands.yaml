@@ -1534,3 +1534,84 @@ type_enum_optional_positional: ## Test optional positional enum without default 
     optional:
       - env:
         values: [dev, staging, prod]
+
+## ============================================================================
+## TYPED ENUM TESTS
+## ============================================================================
+
+# Valid typed enum - all values are integers
+type_enum_int_valid: ## Test typed enum with valid int values
+  script: echo "level={level}"
+  params:
+    required:
+      - level: '-l, --level'
+        type: int
+        values: [1, 2, 3]
+        default: 1
+
+# Valid typed enum - string type (explicit)
+type_enum_string_explicit: ## Test typed enum with explicit string type
+  script: echo "platform={platform}"
+  params:
+    required:
+      - platform: '-p, --platform'
+        type: string
+        values: [ios, android, web]
+        default: ios
+
+# Valid typed enum - double type with integers (coercion)
+type_enum_double_with_int: ## Test typed enum double accepts integers
+  script: echo "ratio={ratio}"
+  params:
+    optional:
+      - ratio: '-r, --ratio'
+        type: double
+        values: [1, 2, 3]
+        default: 1
+
+# Valid typed enum - int type with whole number doubles
+type_enum_int_with_whole_doubles: ## Test typed enum int accepts whole doubles
+  script: echo "count={count}"
+  params:
+    optional:
+      - count: '-c, --count'
+        type: int
+        values: [1, 2.0, 3]
+        default: 2.0
+
+# No type specified - mixed values should work
+type_enum_no_type_mixed: ## Test enum without type allows mixed values
+  script: echo "value={value}"
+  params:
+    optional:
+      - value: '-v, --value'
+        values: [1, text, 3.3]
+        default: 1
+
+# Invalid typed enum - int type with string value (should fail at activation)
+invalid_typed_enum_int_string: ## Invalid: int enum with string value
+  script: echo "platform={platform}"
+  params:
+    required:
+      - platform: '-p, --platform'
+        type: int
+        values: [ios, 1, 2]
+
+# Invalid typed enum - int type with multiple invalid values
+invalid_typed_enum_int_multi: ## Invalid: int enum with string and double
+  script: echo "platform={platform}"
+  params:
+    required:
+      - platform:
+        type: int
+        values: [ios, 1, 2.2]
+
+# Invalid typed enum - int default is string
+invalid_typed_enum_int_default: ## Invalid: int enum with string default
+  script: echo "level={level}"
+  params:
+    required:
+      - level: '-l, --level'
+        type: int
+        values: [1, 2, 3]
+        default: text

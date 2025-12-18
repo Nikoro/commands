@@ -985,4 +985,218 @@ void main() {
       });
     }
   });
+
+  // ============================================================================
+  // TYPED ENUM TESTS
+  // ============================================================================
+
+  group('type_enum_int_valid', () {
+    test('runs with default int enum value', () async {
+      final result = await Process.run('type_enum_int_valid', []);
+      expect(result.stdout, equals('level=1\n'));
+    });
+
+    test('accepts valid int enum value', () async {
+      final result = await Process.run('type_enum_int_valid', ['-l', '2']);
+      expect(result.stdout, equals('level=2\n'));
+    });
+
+    test('accepts another valid int enum value', () async {
+      final result = await Process.run('type_enum_int_valid', ['--level', '3']);
+      expect(result.stdout, equals('level=3\n'));
+    });
+
+    test('rejects string value for int enum', () async {
+      final result = await Process.run('type_enum_int_valid', ['-l', 'text']);
+      expect(result.stderr, contains('Parameter'));
+      expect(result.stderr, contains('level'));
+      expect(result.stderr, contains('[integer]'));
+      expect(result.stderr, contains('[string]'));
+      expect(result.exitCode, equals(1));
+    });
+
+    test('rejects double value for int enum', () async {
+      final result = await Process.run('type_enum_int_valid', ['-l', '2.5']);
+      expect(result.stderr, contains('Parameter'));
+      expect(result.stderr, contains('level'));
+      expect(result.stderr, contains('[integer]'));
+      expect(result.stderr, contains('[double]'));
+      expect(result.exitCode, equals(1));
+    });
+
+    test('rejects value not in enum list', () async {
+      final result = await Process.run('type_enum_int_valid', ['-l', '99']);
+      expect(result.stderr, contains('invalid value'));
+      expect(result.stderr, contains('99'));
+      expect(result.exitCode, equals(1));
+    });
+
+    for (String flag in ['-h', '--help']) {
+      test('$flag prints help with int type and values', () async {
+        final result = await Process.run('type_enum_int_valid', [flag]);
+        expect(
+          result.stdout,
+          equals(
+            '${blue}type_enum_int_valid$reset: ${gray}Test typed enum with valid int values$reset\n'
+            'params:\n'
+            '  required:\n'
+            '    ${magenta}level (-l, --level)$reset ${gray}[int]$reset\n'
+            '    ${bold}values$reset: 1, 2, 3\n'
+            '    ${bold}default$reset: "1"\n',
+          ),
+        );
+      });
+    }
+  });
+
+  group('type_enum_string_explicit', () {
+    test('runs with default string enum value', () async {
+      final result = await Process.run('type_enum_string_explicit', []);
+      expect(result.stdout, equals('platform=ios\n'));
+    });
+
+    test('accepts valid string enum value', () async {
+      final result = await Process.run('type_enum_string_explicit', ['-p', 'android']);
+      expect(result.stdout, equals('platform=android\n'));
+    });
+
+    test('rejects value not in enum list', () async {
+      final result = await Process.run('type_enum_string_explicit', ['-p', 'windows']);
+      expect(result.stderr, contains('invalid value'));
+      expect(result.exitCode, equals(1));
+    });
+
+    for (String flag in ['-h', '--help']) {
+      test('$flag prints help with string type and values', () async {
+        final result = await Process.run('type_enum_string_explicit', [flag]);
+        expect(
+          result.stdout,
+          equals(
+            '${blue}type_enum_string_explicit$reset: ${gray}Test typed enum with explicit string type$reset\n'
+            'params:\n'
+            '  required:\n'
+            '    ${magenta}platform (-p, --platform)$reset ${gray}[string]$reset\n'
+            '    ${bold}values$reset: ios, android, web\n'
+            '    ${bold}default$reset: "ios"\n',
+          ),
+        );
+      });
+    }
+  });
+
+  group('type_enum_double_with_int', () {
+    test('runs with default value', () async {
+      final result = await Process.run('type_enum_double_with_int', []);
+      expect(result.stdout, equals('ratio=1\n'));
+    });
+
+    test('accepts integer value for double enum (coercion)', () async {
+      final result = await Process.run('type_enum_double_with_int', ['-r', '2']);
+      expect(result.stdout, equals('ratio=2\n'));
+    });
+
+    test('accepts double value for double enum', () async {
+      final result = await Process.run('type_enum_double_with_int', ['-r', '3.0']);
+      expect(result.stdout, equals('ratio=3.0\n'));
+    });
+
+    test('rejects string value for double enum', () async {
+      final result = await Process.run('type_enum_double_with_int', ['-r', 'text']);
+      expect(result.stderr, contains('Parameter'));
+      expect(result.stderr, contains('ratio'));
+      expect(result.stderr, contains('[double]'));
+      expect(result.exitCode, equals(1));
+    });
+  });
+
+  group('type_enum_int_with_whole_doubles', () {
+    test('runs with default value (2.0 as whole number)', () async {
+      final result = await Process.run('type_enum_int_with_whole_doubles', []);
+      expect(result.stdout, equals('count=2.0\n'));
+    });
+
+    test('accepts integer value', () async {
+      final result = await Process.run('type_enum_int_with_whole_doubles', ['-c', '1']);
+      expect(result.stdout, equals('count=1\n'));
+    });
+
+    test('accepts whole number double (3.0)', () async {
+      final result = await Process.run('type_enum_int_with_whole_doubles', ['-c', '3.0']);
+      expect(result.stdout, equals('count=3.0\n'));
+    });
+
+    test('rejects non-whole number double for int enum', () async {
+      final result = await Process.run('type_enum_int_with_whole_doubles', ['-c', '2.5']);
+      expect(result.stderr, contains('Parameter'));
+      expect(result.stderr, contains('count'));
+      expect(result.stderr, contains('[integer]'));
+      expect(result.exitCode, equals(1));
+    });
+  });
+
+  group('type_enum_no_type_mixed', () {
+    test('runs with default value', () async {
+      final result = await Process.run('type_enum_no_type_mixed', []);
+      expect(result.stdout, equals('value=1\n'));
+    });
+
+    test('accepts integer value', () async {
+      final result = await Process.run('type_enum_no_type_mixed', ['-v', '1']);
+      expect(result.stdout, equals('value=1\n'));
+    });
+
+    test('accepts string value', () async {
+      final result = await Process.run('type_enum_no_type_mixed', ['-v', 'text']);
+      expect(result.stdout, equals('value=text\n'));
+    });
+
+    test('accepts double value', () async {
+      final result = await Process.run('type_enum_no_type_mixed', ['-v', '3.3']);
+      expect(result.stdout, equals('value=3.3\n'));
+    });
+
+    test('rejects value not in enum list', () async {
+      final result = await Process.run('type_enum_no_type_mixed', ['-v', 'invalid']);
+      expect(result.stderr, contains('invalid value'));
+      expect(result.exitCode, equals(1));
+    });
+  });
+
+  // ============================================================================
+  // INVALID TYPED ENUM TESTS (validation at load time)
+  // ============================================================================
+
+  group('invalid_typed_enum_int_string', () {
+    test('shows validation error when command is run', () async {
+      final result = await Process.run('invalid_typed_enum_int_string', []);
+      expect(result.stderr, contains('Parameter'));
+      expect(result.stderr, contains('platform'));
+      expect(result.stderr, contains('[integer]'));
+      expect(result.stderr, contains('"ios"'));
+      expect(result.stderr, contains('[string]'));
+      expect(result.exitCode, equals(1));
+    });
+  });
+
+  group('invalid_typed_enum_int_multi', () {
+    test('shows validation error with multiple invalid values', () async {
+      final result = await Process.run('invalid_typed_enum_int_multi', []);
+      expect(result.stderr, contains('Parameter'));
+      expect(result.stderr, contains('platform'));
+      expect(result.stderr, contains('[integer]'));
+      expect(result.stderr, contains('"ios"'));
+      expect(result.stderr, contains('"2.2"'));
+      expect(result.exitCode, equals(1));
+    });
+  });
+
+  group('invalid_typed_enum_int_default', () {
+    test('shows validation error for invalid default type', () async {
+      final result = await Process.run('invalid_typed_enum_int_default', []);
+      expect(result.stderr, contains('Parameter'));
+      expect(result.stderr, contains('level'));
+      expect(result.stderr, contains('"text"'));
+      expect(result.exitCode, equals(1));
+    });
+  });
 }

@@ -393,5 +393,236 @@ void main() {
         expect(result.isValid, isTrue);
       });
     });
+
+    group('EnumTypeValidator', () {
+      group('isValidInt', () {
+        test('returns true for valid integers', () {
+          expect(EnumTypeValidator.isValidInt('1'), isTrue);
+          expect(EnumTypeValidator.isValidInt('42'), isTrue);
+          expect(EnumTypeValidator.isValidInt('-10'), isTrue);
+          expect(EnumTypeValidator.isValidInt('0'), isTrue);
+        });
+
+        test('returns true for whole number doubles (2.0, 3.0)', () {
+          expect(EnumTypeValidator.isValidInt('2.0'), isTrue);
+          expect(EnumTypeValidator.isValidInt('3.0'), isTrue);
+          expect(EnumTypeValidator.isValidInt('-5.0'), isTrue);
+        });
+
+        test('returns false for non-integer doubles', () {
+          expect(EnumTypeValidator.isValidInt('2.5'), isFalse);
+          expect(EnumTypeValidator.isValidInt('3.14'), isFalse);
+          expect(EnumTypeValidator.isValidInt('0.1'), isFalse);
+        });
+
+        test('returns false for strings', () {
+          expect(EnumTypeValidator.isValidInt('ios'), isFalse);
+          expect(EnumTypeValidator.isValidInt('abc'), isFalse);
+          expect(EnumTypeValidator.isValidInt('text'), isFalse);
+        });
+      });
+
+      group('isValidDouble', () {
+        test('returns true for doubles', () {
+          expect(EnumTypeValidator.isValidDouble('3.14'), isTrue);
+          expect(EnumTypeValidator.isValidDouble('0.5'), isTrue);
+          expect(EnumTypeValidator.isValidDouble('-2.5'), isTrue);
+        });
+
+        test('returns true for integers (coercion)', () {
+          expect(EnumTypeValidator.isValidDouble('1'), isTrue);
+          expect(EnumTypeValidator.isValidDouble('42'), isTrue);
+          expect(EnumTypeValidator.isValidDouble('-10'), isTrue);
+        });
+
+        test('returns false for strings', () {
+          expect(EnumTypeValidator.isValidDouble('ios'), isFalse);
+          expect(EnumTypeValidator.isValidDouble('abc'), isFalse);
+          expect(EnumTypeValidator.isValidDouble('text'), isFalse);
+        });
+      });
+
+      group('getValueType', () {
+        test('returns integer for int values', () {
+          expect(EnumTypeValidator.getValueType('1'), equals('integer'));
+          expect(EnumTypeValidator.getValueType('42'), equals('integer'));
+          expect(EnumTypeValidator.getValueType('-5'), equals('integer'));
+        });
+
+        test('returns double for double values', () {
+          expect(EnumTypeValidator.getValueType('3.14'), equals('double'));
+          expect(EnumTypeValidator.getValueType('0.5'), equals('double'));
+          expect(EnumTypeValidator.getValueType('2.0'), equals('double'));
+        });
+
+        test('returns string for non-numeric values', () {
+          expect(EnumTypeValidator.getValueType('ios'), equals('string'));
+          expect(EnumTypeValidator.getValueType('abc'), equals('string'));
+          expect(EnumTypeValidator.getValueType('text'), equals('string'));
+        });
+      });
+
+      group('validateEnumValues', () {
+        test('returns success when type is null', () {
+          final result = EnumTypeValidator.validateEnumValues(
+            'platform',
+            null,
+            ['ios', 'android', 'web'],
+          );
+          expect(result.isValid, isTrue);
+        });
+
+        test('returns success when type is string', () {
+          final result = EnumTypeValidator.validateEnumValues(
+            'platform',
+            'string',
+            ['ios', 'android', 'web'],
+          );
+          expect(result.isValid, isTrue);
+        });
+
+        test('returns success when all values match int type', () {
+          final result = EnumTypeValidator.validateEnumValues(
+            'level',
+            'int',
+            ['1', '2', '3'],
+          );
+          expect(result.isValid, isTrue);
+        });
+
+        test('returns success when int enum has whole number doubles', () {
+          final result = EnumTypeValidator.validateEnumValues(
+            'level',
+            'int',
+            ['1', '2.0', '3'],
+          );
+          expect(result.isValid, isTrue);
+        });
+
+        test('returns success when all values match double type', () {
+          final result = EnumTypeValidator.validateEnumValues(
+            'ratio',
+            'double',
+            ['0.5', '1.0', '1.5'],
+          );
+          expect(result.isValid, isTrue);
+        });
+
+        test('returns success when double enum has integers', () {
+          final result = EnumTypeValidator.validateEnumValues(
+            'ratio',
+            'double',
+            ['1', '2', '3'],
+          );
+          expect(result.isValid, isTrue);
+        });
+
+        test('returns error when int enum has string value', () {
+          final result = EnumTypeValidator.validateEnumValues(
+            'platform',
+            'int',
+            ['ios', '1', '2'],
+          );
+          expect(result.isValid, isFalse);
+          expect(result.errorMessage, contains('platform'));
+          expect(result.errorMessage, contains('[integer]'));
+          expect(result.errorMessage, contains('"ios"'));
+          expect(result.errorMessage, contains('[string]'));
+        });
+
+        test('returns error with multiple invalid values', () {
+          final result = EnumTypeValidator.validateEnumValues(
+            'platform',
+            'int',
+            ['ios', '1', '2.2'],
+          );
+          expect(result.isValid, isFalse);
+          expect(result.errorMessage, contains('"ios"'));
+          expect(result.errorMessage, contains('"2.2"'));
+          expect(result.errorMessage, contains('[string]'));
+          expect(result.errorMessage, contains('[double]'));
+        });
+
+        test('returns error when double enum has string value', () {
+          final result = EnumTypeValidator.validateEnumValues(
+            'ratio',
+            'double',
+            ['text', '1.5', '2.0'],
+          );
+          expect(result.isValid, isFalse);
+          expect(result.errorMessage, contains('ratio'));
+          expect(result.errorMessage, contains('[double]'));
+          expect(result.errorMessage, contains('"text"'));
+        });
+      });
+
+      group('validateEnumDefault', () {
+        test('returns success when type is null', () {
+          final result = EnumTypeValidator.validateEnumDefault(
+            'platform',
+            null,
+            'text',
+            ['text', 'value'],
+          );
+          expect(result.isValid, isTrue);
+        });
+
+        test('returns success when type is string', () {
+          final result = EnumTypeValidator.validateEnumDefault(
+            'platform',
+            'string',
+            'text',
+            ['text', 'value'],
+          );
+          expect(result.isValid, isTrue);
+        });
+
+        test('returns success when default matches int type', () {
+          final result = EnumTypeValidator.validateEnumDefault(
+            'level',
+            'int',
+            '1',
+            ['1', '2', '3'],
+          );
+          expect(result.isValid, isTrue);
+        });
+
+        test('returns success when int default is whole number double', () {
+          final result = EnumTypeValidator.validateEnumDefault(
+            'level',
+            'int',
+            '2.0',
+            ['1', '2.0', '3'],
+          );
+          expect(result.isValid, isTrue);
+        });
+
+        test('returns error when int default is string', () {
+          final result = EnumTypeValidator.validateEnumDefault(
+            'platform',
+            'int',
+            'text',
+            ['1', '2', '3'],
+          );
+          expect(result.isValid, isFalse);
+          expect(result.errorMessage, contains('platform'));
+          expect(result.errorMessage, contains('"text"'));
+          expect(result.hint, contains('Integer'));
+          expect(result.hint, contains('Must be one of'));
+        });
+
+        test('returns error when double default is string', () {
+          final result = EnumTypeValidator.validateEnumDefault(
+            'ratio',
+            'double',
+            'text',
+            ['0.5', '1.0', '1.5'],
+          );
+          expect(result.isValid, isFalse);
+          expect(result.errorMessage, contains('ratio'));
+          expect(result.errorMessage, contains('"text"'));
+        });
+      });
+    });
   });
 }
