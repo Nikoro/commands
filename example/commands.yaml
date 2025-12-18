@@ -1513,3 +1513,24 @@ type_enum_required_positional: ## Test required positional enum without default
     required:
       - platform:
         values: [Alpha, Bravo, Charlie]
+
+type_enum_required_named: ## Test required named enum without default (picker)
+  script: echo "platform={platform}"
+  params:
+    required:
+      - platform: '-p, --platform'
+        values: [ios, android, web]
+
+type_enum_optional_named: ## Test optional named enum without default (no picker)
+  script: echo "platform={platform}"
+  params:
+    optional:
+      - platform: '-p, --platform'
+        values: [ios, android, web]
+
+type_enum_optional_positional: ## Test optional positional enum without default (no picker)
+  script: echo "env={env}"
+  params:
+    optional:
+      - env:
+        values: [dev, staging, prod]

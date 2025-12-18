@@ -281,14 +281,14 @@ Future<void> run(String name, List<String> args) async {
   }
 
   // Handle enum pickers for parameters without defaults and without provided values
-  // Check both required and optional params for enums that need picker
+  // Only show picker for REQUIRED params - optional params without values are left empty
   // This runs AFTER positional processing to ensure invalid values are caught first
-  final allParams = [...resolvedCommand.requiredParams, ...resolvedCommand.optionalParams];
-  for (final param in allParams) {
+  for (final param in resolvedCommand.requiredParams) {
     // Only show picker if:
     // 1. Parameter is an enum (has values)
     // 2. No default value exists
     // 3. No value has been provided yet
+    // 4. Parameter is required (we're iterating requiredParams only)
     if (param.requiresEnumPicker && commandValues[param.name] == null) {
       final selectedValue = EnumPicker.pick(param, param.name);
 

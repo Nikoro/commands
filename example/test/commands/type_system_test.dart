@@ -103,25 +103,15 @@ void main() {
   });
 
   // ============================================================================
-  // ENUM WITHOUT DEFAULT TESTS (PICKER)
+  // ENUM WITHOUT DEFAULT TESTS (OPTIONAL - NO PICKER)
   // ============================================================================
 
   group('type_enum_no_default', () {
-    test('shows interactive picker when no option specified', () async {
+    test('runs without picker when no option specified (optional enum)', () async {
       final result = await Process.run('type_enum_no_default', []);
-      expect(
-        result.stdout,
-        equals('\n'
-            'Select value for ${blue}target$reset:\n'
-            '\n'
-            '    ${green}1. ios     ✓$reset\n'
-            '    2. android  \n'
-            '    3. web      \n'
-            '\n'
-            '${gray}Press number (1-3) or press Esc to cancel:$reset\n'
-            ''),
-      );
+      expect(result.stdout, equals('target=\n'));
     });
+
     test('accepts -t flag with valid enum value', () async {
       final result = await Process.run('type_enum_no_default', ['-t', 'ios']);
       expect(result.stdout, equals('target=ios\n'));
@@ -832,6 +822,164 @@ void main() {
             '  required:\n'
             '    ${magenta}code (-c, --code)$reset ${gray}[string]$reset\n'
             '    ${magenta}version (-v, --version)$reset ${gray}[string]$reset\n',
+          ),
+        );
+      });
+    }
+  });
+
+  // ============================================================================
+  // REQUIRED NAMED ENUM WITHOUT DEFAULT (PICKER) TESTS
+  // ============================================================================
+
+  group('type_enum_required_named', () {
+    test('shows interactive picker when no option specified (required enum)', () async {
+      final result = await Process.run('type_enum_required_named', []);
+      expect(
+        result.stdout,
+        equals('\n'
+            'Select value for ${blue}platform$reset:\n'
+            '\n'
+            '    ${green}1. ios     ✓$reset\n'
+            '    2. android  \n'
+            '    3. web      \n'
+            '\n'
+            '${gray}Press number (1-3) or press Esc to cancel:$reset\n'
+            ''),
+      );
+    });
+
+    test('accepts -p flag with valid enum value', () async {
+      final result = await Process.run('type_enum_required_named', ['-p', 'ios']);
+      expect(result.stdout, equals('platform=ios\n'));
+    });
+
+    test('accepts --platform flag with valid enum value', () async {
+      final result = await Process.run('type_enum_required_named', ['--platform', 'android']);
+      expect(result.stdout, equals('platform=android\n'));
+    });
+
+    test('rejects invalid enum value', () async {
+      final result = await Process.run('type_enum_required_named', ['-p', 'desktop']);
+      expect(
+        result.stderr,
+        equals(
+          "❌ Parameter ${red}platform$reset has invalid value: \"desktop\"\n"
+          "💡 Must be one of: ${green}ios$reset, ${green}android$reset, ${green}web$reset\n",
+        ),
+      );
+      expect(result.exitCode, equals(1));
+    });
+
+    for (String flag in ['-h', '--help']) {
+      test('$flag prints help with enum values', () async {
+        final result = await Process.run('type_enum_required_named', [flag]);
+        expect(
+          result.stdout,
+          equals(
+            '${blue}type_enum_required_named$reset: ${gray}Test required named enum without default (picker)$reset\n'
+            'params:\n'
+            '  required:\n'
+            '    ${magenta}platform (-p, --platform)$reset\n'
+            '    ${bold}values$reset: ios, android, web\n',
+          ),
+        );
+      });
+    }
+  });
+
+  // ============================================================================
+  // OPTIONAL NAMED ENUM WITHOUT DEFAULT (NO PICKER) TESTS
+  // ============================================================================
+
+  group('type_enum_optional_named', () {
+    test('runs without picker when no option specified (optional enum)', () async {
+      final result = await Process.run('type_enum_optional_named', []);
+      expect(result.stdout, equals('platform=\n'));
+    });
+
+    test('accepts -p flag with valid enum value', () async {
+      final result = await Process.run('type_enum_optional_named', ['-p', 'ios']);
+      expect(result.stdout, equals('platform=ios\n'));
+    });
+
+    test('accepts --platform flag with valid enum value', () async {
+      final result = await Process.run('type_enum_optional_named', ['--platform', 'web']);
+      expect(result.stdout, equals('platform=web\n'));
+    });
+
+    test('rejects invalid enum value', () async {
+      final result = await Process.run('type_enum_optional_named', ['-p', 'desktop']);
+      expect(
+        result.stderr,
+        equals(
+          "❌ Parameter ${red}platform$reset has invalid value: \"desktop\"\n"
+          "💡 Must be one of: ${green}ios$reset, ${green}android$reset, ${green}web$reset\n",
+        ),
+      );
+      expect(result.exitCode, equals(1));
+    });
+
+    for (String flag in ['-h', '--help']) {
+      test('$flag prints help with enum values', () async {
+        final result = await Process.run('type_enum_optional_named', [flag]);
+        expect(
+          result.stdout,
+          equals(
+            '${blue}type_enum_optional_named$reset: ${gray}Test optional named enum without default (no picker)$reset\n'
+            'params:\n'
+            '  optional:\n'
+            '    ${magenta}platform (-p, --platform)$reset\n'
+            '    ${bold}values$reset: ios, android, web\n',
+          ),
+        );
+      });
+    }
+  });
+
+  // ============================================================================
+  // OPTIONAL POSITIONAL ENUM WITHOUT DEFAULT (NO PICKER) TESTS
+  // ============================================================================
+
+  group('type_enum_optional_positional', () {
+    test('runs without picker when no argument specified (optional positional enum)', () async {
+      final result = await Process.run('type_enum_optional_positional', []);
+      expect(result.stdout, equals('env=\n'));
+    });
+
+    test('accepts valid positional enum value', () async {
+      final result = await Process.run('type_enum_optional_positional', ['dev']);
+      expect(result.stdout, equals('env=dev\n'));
+    });
+
+    test('accepts another valid positional enum value', () async {
+      final result = await Process.run('type_enum_optional_positional', ['staging']);
+      expect(result.stdout, equals('env=staging\n'));
+    });
+
+    test('rejects invalid positional enum value', () async {
+      final result = await Process.run('type_enum_optional_positional', ['invalid']);
+      expect(
+        result.stderr,
+        equals(
+          "❌ Parameter ${red}env$reset has invalid value: \"invalid\"\n"
+          "💡 Must be one of: ${green}dev$reset, ${green}staging$reset, ${green}prod$reset\n",
+        ),
+      );
+      expect(result.exitCode, equals(1));
+    });
+
+    for (String flag in ['-h', '--help']) {
+      test('$flag prints help with enum values', () async {
+        final result = await Process.run('type_enum_optional_positional', [flag]);
+        expect(
+          result.stdout,
+          equals(
+            '${blue}type_enum_optional_positional$reset: ${gray}Test optional positional enum without default (no picker)$reset\n'
+            'params:\n'
+            '  optional:\n'
+            '    ${magenta}env$reset\n'
+            '    ${bold}values$reset: dev, staging, prod\n',
           ),
         );
       });
