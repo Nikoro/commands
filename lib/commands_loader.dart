@@ -614,6 +614,9 @@ Map<String, Command> loadCommandsFrom(File yaml) {
         }
       }
 
+      // Finalize the parameter immediately after values are processed
+      // This ensures the param is updated with values before moving to the next line
+      finalizeCurrentParam();
       continue;
     }
 
