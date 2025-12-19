@@ -201,7 +201,8 @@ Future<void> run(String name, List<String> args) async {
               final valueType = EnumTypeValidator.getValueType(value);
               stderr.writeln('❌ Parameter $bold$red$paramName$reset expects an $gray[$typeName]$reset');
               stderr.writeln('   Got: "$value" $gray[$valueType]$reset');
-              stderr.writeln('💡 ${typeName![0].toUpperCase()}${typeName.substring(1)} parameters must have valid $typeName values');
+              stderr.writeln(
+                  '💡 ${typeName![0].toUpperCase()}${typeName.substring(1)} parameters must have valid $typeName values');
               exit(1);
             }
           }
@@ -273,7 +274,8 @@ Future<void> run(String name, List<String> args) async {
           final valueType = EnumTypeValidator.getValueType(value);
           stderr.writeln('❌ Parameter $bold$red$paramName$reset expects an $gray[$typeName]$reset');
           stderr.writeln('   Got: "$value" $gray[$valueType]$reset');
-          stderr.writeln('💡 ${typeName![0].toUpperCase()}${typeName.substring(1)} parameters must have valid $typeName values');
+          stderr.writeln(
+              '💡 ${typeName![0].toUpperCase()}${typeName.substring(1)} parameters must have valid $typeName values');
           exit(1);
         }
       }

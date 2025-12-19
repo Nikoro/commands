@@ -735,7 +735,8 @@ Map<String, Command> loadCommandsFrom(File yaml) {
 
         // Validation: typed enum default - ensure default matches the explicit type
         if (type != null && values != null && values.isNotEmpty && currentParamMetadata['isTypeExplicit'] == true) {
-          final enumDefaultValidation = EnumTypeValidator.validateEnumDefault(currentParamName, type, defaultValue, values);
+          final enumDefaultValidation =
+              EnumTypeValidator.validateEnumDefault(currentParamName, type, defaultValue, values);
           if (!enumDefaultValidation.isValid && currentCommand != null) {
             _validationErrors[currentCommand] = enumDefaultValidation.errorMessage ?? 'validation error';
             currentParamName = null;

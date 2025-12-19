@@ -243,7 +243,8 @@ class EnumTypeValidator {
 
     return ValidationResult.error(
       'Parameter $bold$red$paramName$reset expects an $gray[$typeName]$reset\n      Got: $gotParts',
-      hint: '${typeName.substring(0, 1).toUpperCase()}${typeName.substring(1)} parameters must have valid $typeName values',
+      hint:
+          '${typeName.substring(0, 1).toUpperCase()}${typeName.substring(1)} parameters must have valid $typeName values',
     );
   }
 
@@ -272,7 +273,8 @@ class EnumTypeValidator {
     }
 
     final typeName = type == 'int' ? 'integer' : type;
-    final hint = StringBuffer('${typeName.substring(0, 1).toUpperCase()}${typeName.substring(1)} parameters must have a valid $typeName default');
+    final hint = StringBuffer(
+        '${typeName.substring(0, 1).toUpperCase()}${typeName.substring(1)} parameters must have a valid $typeName default');
 
     if (values != null && values.isNotEmpty) {
       hint.write('\n💡 Must be one of: ${values.join(', ')}');

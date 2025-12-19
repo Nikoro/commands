@@ -28,9 +28,6 @@ test_invalid_enum:
 ''');
 
       final commands = loadCommandsFrom(testYaml);
-      print('Commands: $commands');
-      print('Validation errors: $commandValidationErrors');
-
       expect(commandValidationErrors.containsKey('test_invalid_enum'), isTrue,
           reason: 'Expected validation error for test_invalid_enum');
       expect(commandValidationErrors['test_invalid_enum'], contains('platform'));
@@ -51,14 +48,13 @@ test_invalid_enum_multi:
 ''');
 
       final commands = loadCommandsFrom(testYaml);
-      print('Commands: $commands');
-      print('Validation errors: $commandValidationErrors');
-
       expect(commandValidationErrors.containsKey('test_invalid_enum_multi'), isTrue,
           reason: 'Expected validation error for test_invalid_enum_multi');
       expect(commandValidationErrors['test_invalid_enum_multi'], contains('platform'));
       expect(commandValidationErrors['test_invalid_enum_multi'], contains('"ios"'));
       expect(commandValidationErrors['test_invalid_enum_multi'], contains('"2.2"'));
+      expect(commands.containsKey('test_invalid_enum_multi'), isFalse,
+          reason: 'Invalid command should not be in commands map');
     });
   });
 }
