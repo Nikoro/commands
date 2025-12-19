@@ -97,11 +97,26 @@ class Param {
 
   /// Validates if the given value is allowed for this parameter
   ///
-  /// For enum parameters, validates against the allowed values list (case-insensitive)
+  /// For enum parameters, validates against the allowed values list
+  /// - For string types: case-insensitive string comparison
+  /// - For numeric types (int/double): numeric equivalence (e.g., "3.0" == "3" for int)
   /// For non-enum parameters, always returns true
   bool isValidValue(String value) {
     if (!isEnum) return true;
 
+    // For numeric types, compare numeric values
+    if (type == 'int' || type == 'double') {
+      final valueNum = double.tryParse(value);
+      if (valueNum == null) return false;
+
+      return values!.any((v) {
+        final enumNum = double.tryParse(v);
+        if (enumNum == null) return false;
+        return valueNum == enumNum;
+      });
+    }
+
+    // For string/boolean types, use case-insensitive string comparison
     final lowerValue = value.toLowerCase();
     return values!.any((v) => v.toLowerCase() == lowerValue);
   }
