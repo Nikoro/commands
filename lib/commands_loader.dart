@@ -580,10 +580,12 @@ Map<String, Command> loadCommandsFrom(File yaml) {
           .split(',')
           .map((v) => v.trim())
           .map((v) {
-            // Remove quotes if present
+            // If quoted, remove quotes and keep as string
             if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith("'") && v.endsWith("'"))) {
               return v.substring(1, v.length - 1);
             }
+            // If not quoted, keep as-is (YAML parser will treat unquoted values as strings)
+            // The values remain as strings here, validation will check type compatibility
             return v;
           })
           .where((v) => v.isNotEmpty)

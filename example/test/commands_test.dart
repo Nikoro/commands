@@ -114,13 +114,21 @@ void main() {
           '✅ ${bold}${green}type_enum_required_named$reset:                          ${gray}Test required named enum without default (picker). Type "type_enum_required_named --help" to learn more.$reset\n'
           '✅ ${bold}${green}type_enum_optional_named$reset:                          ${gray}Test optional named enum without default (no picker). Type "type_enum_optional_named --help" to learn more.$reset\n'
           '✅ ${bold}${green}type_enum_optional_positional$reset:                     ${gray}Test optional positional enum without default (no picker). Type "type_enum_optional_positional --help" to learn more.$reset\n'
+          '✅ ${bold}${green}type_enum_int_valid$reset:                               ${gray}Test typed enum with valid int values. Type "type_enum_int_valid --help" to learn more.$reset\n'
+          '✅ ${bold}${green}type_enum_string_explicit$reset:                         ${gray}Test typed enum with explicit string type. Type "type_enum_string_explicit --help" to learn more.$reset\n'
+          '✅ ${bold}${green}type_enum_double_with_int$reset:                         ${gray}Test typed enum double accepts integers. Type "type_enum_double_with_int --help" to learn more.$reset\n'
+          '✅ ${bold}${green}type_enum_int_with_whole_doubles$reset:                  ${gray}Test typed enum int accepts whole doubles. Type "type_enum_int_with_whole_doubles --help" to learn more.$reset\n'
+          '✅ ${bold}${green}type_enum_no_type_mixed$reset:                           ${gray}Test enum without type allows mixed values. Type "type_enum_no_type_mixed --help" to learn more.$reset\n'
+          '✅ ${bold}${green}invalid_typed_enum_int_string$reset:                     ${gray}Invalid: int enum with string value. Type "invalid_typed_enum_int_string --help" to learn more.$reset\n'
+          '✅ ${bold}${green}invalid_typed_enum_int_multi$reset:                      ${gray}Invalid: int enum with string and double. Type "invalid_typed_enum_int_multi --help" to learn more.$reset\n'
           '⚠️  ${bold}${yellow}test$reset:                                              is a ${bold}${yellow}reserved$reset command. ${gray}In order to override it see: \x1B]8;;https://github.com/Nikoro/commands/blob/main/README.md#overriding-existing-commands\x1B\\README\x1B]8;;\x1B\\$reset\n'
           '❌ ${bold}${red}invalid!$reset:                                          contains invalid characters\n'
           '❌ ${bold}${red}invalid_quoted_int$reset:                                Parameter ${bold}${red}port$reset is declared as type ${gray}[int]$reset, but its default value is ${gray}[string]$reset\n'
           '❌ ${bold}${red}invalid_quoted_double$reset:                             Parameter ${bold}${red}timeout$reset is declared as type ${gray}[double]$reset, but its default value is ${gray}[string]$reset\n'
           '❌ ${bold}${red}invalid_string_int$reset:                                Parameter ${bold}${red}code$reset is declared as type ${gray}[string]$reset, but its default value is ${gray}[int]$reset\n'
           '❌ ${bold}${red}invalid_string_double$reset:                             Parameter ${bold}${red}version$reset is declared as type ${gray}[string]$reset, but its default value is ${gray}[double]$reset\n'
-          '❌ ${bold}${red}invalid_script_and_switch$reset:                         Cannot use both ${bold}${red}script$reset and ${bold}${red}switch$reset at the same time\n',
+          '❌ ${bold}${red}invalid_script_and_switch$reset:                         Cannot use both ${bold}${red}script$reset and ${bold}${red}switch$reset at the same time\n'
+          '❌ ${bold}${red}invalid_typed_enum_int_default$reset:                    Parameter ${bold}${red}level$reset has invalid default: "text"\n',
         ),
       );
 
