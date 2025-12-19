@@ -614,9 +614,37 @@ Map<String, Command> loadCommandsFrom(File yaml) {
         }
       }
 
-      // Finalize the parameter immediately after values are processed
-      // This ensures the param is updated with values before moving to the next line
-      finalizeCurrentParam();
+      // Build and update the param with the values immediately
+      // This ensures params with only values (no default) get their values applied
+      final existing = tempParams[currentParamName]!;
+      final updated = Param(
+        name: existing.name,
+        description: currentParamMetadata['description'] as String? ?? existing.description,
+        defaultValue: existing.defaultValue,
+        flags: currentParamMetadata['flags'] as String? ?? existing.flags,
+        type: type,
+        values: valuesList,
+        isTypeExplicit: currentParamMetadata['isTypeExplicit'] as bool? ?? false,
+      );
+
+      tempParams[currentParamName!] = updated;
+
+      // Replace in list
+      final targetMap = getCurrentTargetMap();
+      targetMap['params'] ??= {'required': <Param>[], 'optional': <Param>[]};
+
+      final paramsMap = targetMap['params'];
+      if (paramsMap is Map && currentParamType != null) {
+        final paramList = paramsMap[currentParamType];
+        if (paramList is List<Param>) {
+          final idx = paramList.indexWhere((p) => p.name == currentParamName);
+          if (idx != -1) {
+            paramList[idx] = updated;
+          }
+        }
+      }
+
+      // DON'T reset currentParamName here - the default: handler might come next
       continue;
     }
 
