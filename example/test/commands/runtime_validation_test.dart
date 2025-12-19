@@ -38,7 +38,7 @@ void main() {
       expect(
         result.stderr,
         equals(
-          '❌ Parameter $bold${red}port$reset is declared as type $gray[int]$reset, but its default value is $gray[string]$reset\n',
+          '❌ Parameter $bold${red}port$reset is declared as type $gray[integer]$reset, but its default value is $gray[string]$reset\n',
         ),
       );
     });
@@ -88,7 +88,7 @@ void main() {
       expect(
         result.stderr,
         equals(
-          '❌ Parameter $bold${red}port$reset is declared as type $gray[string]$reset, but its default value is $gray[int]$reset\n',
+          '❌ Parameter $bold${red}port$reset is declared as type $gray[string]$reset, but its default value is $gray[integer]$reset\n',
         ),
       );
     });
