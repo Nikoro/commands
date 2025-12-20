@@ -10,6 +10,7 @@ void main() {
       expect(
         result.stdout,
         equals(
+            '✅ ${bold}${green}hello$reset:                                             ${gray}Prints "Hello World". Type "hello --help" to learn more.$reset\n'
             '✅ ${bold}${green}d$reset:                                                 ${gray}Type "d --help" to learn more.$reset\n'
             '✅ ${bold}${green}make$reset:                                              ${gray}Type "make --help" to learn more.$reset\n'
             '✅ ${bold}${green}err_missing_named_req$reset:                             ${gray}Test missing required named param. Type "err_missing_named_req --help" to learn more.$reset\n'

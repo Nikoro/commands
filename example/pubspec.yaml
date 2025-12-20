@@ -9,3 +9,4 @@ dev_dependencies:
   commands_cli:
     path: ../
   test: ^1.28.0
+  meta: ^1.17.0
