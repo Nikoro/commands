@@ -31,7 +31,7 @@ void main() {
         expect(
             result.stderr,
             equals(
-                '❌ Missing value for param: $bold${red}name$reset\n')); // This fails because name is not red and should be, implementation needs to be adjusted
+                '❌ Missing value for param: $bold${red}name$reset\n'));
       });
 
       for (String flag in ['-h', '--help']) {
@@ -77,7 +77,7 @@ params:
           expect(
               result.stderr,
               equals(
-                  '❌ Missing value for param: $bold${red}name$reset\n')); // This fails because name is not red and should be, implementation needs to be adjusted
+                  '❌ Missing value for param: $bold${red}name$reset\n'));
         });
       }
 
@@ -124,7 +124,7 @@ params:
           expect(
               result.stderr,
               equals(
-                  '❌ Missing value for param: $bold${red}name$reset\n')); // This fails because name is not red and should be, implementation needs to be adjusted
+                  '❌ Missing value for param: $bold${red}name$reset\n'));
         });
       }
 
@@ -172,7 +172,7 @@ params:
           expect(
               result.stderr,
               equals(
-                  '❌ Missing value for param: $bold${red}name$reset\n')); // This fails because name is not red and should be, implementation needs to be adjusted
+                  '❌ Missing value for param: $bold${red}name$reset\n'));
         });
       }
 
@@ -221,7 +221,7 @@ params:
           expect(
               result.stderr,
               equals(
-                  '❌ Missing value for param: $bold${red}name$reset\n')); // This fails because name is not red and should be, implementation needs to be adjusted
+                  '❌ Missing value for param: $bold${red}name$reset\n'));
         });
       }
 

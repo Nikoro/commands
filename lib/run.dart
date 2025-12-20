@@ -236,7 +236,7 @@ Future<void> run(String name, List<String> args) async {
           commandValues[paramName] = value;
         } else {
           if (isRequired) {
-            stderr.writeln('❌ Missing value for param: $paramName');
+            stderr.writeln('❌ Missing value for param: $bold$red$paramName$reset');
             exit(1);
           }
         }
