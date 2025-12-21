@@ -45,7 +45,17 @@ class SwitchPicker {
 
         // Add flags if available
         if (switchInfo != null && switchInfo.flags != null && switchInfo.flags!.isNotEmpty) {
-          display += ' ${colors.gray}or: [${switchInfo.flags}]${colors.reset}';
+          // Parse comma-separated flags and format each one with color
+          final flagsList = switchInfo.flags!.split(',').map((f) => f.trim()).where((f) => f.isNotEmpty).toList();
+          if (flagsList.isNotEmpty) {
+            if (isSelected) {
+              final formattedFlags = flagsList.map((flag) => '${colors.green}$flag${colors.reset}').join(', ');
+              display += ' or $formattedFlags';
+            } else {
+              final formattedFlags = flagsList.join(', ');
+              display += ' or $formattedFlags${colors.reset}';
+            }
+          }
         }
 
         // Add description if available

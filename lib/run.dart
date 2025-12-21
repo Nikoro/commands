@@ -416,9 +416,15 @@ void _printSwitchesHelp(Command command, String indent) {
     final nameFormatting = isSwitchNamedDefault ? bold : blue;
 
     // Build the switch line
-    final flags = switchInfo?.flags != null && switchInfo!.flags!.isNotEmpty
-        ? ' ${gray}or: [${switchInfo.flags}]$reset'
-        : '';
+    String flags = '';
+    if (switchInfo?.flags != null && switchInfo!.flags!.isNotEmpty) {
+      // Parse comma-separated flags and format each one with color
+      final flagsList = switchInfo.flags!.split(',').map((f) => f.trim()).where((f) => f.isNotEmpty).toList();
+      if (flagsList.isNotEmpty) {
+        final formattedFlags = flagsList.map((flag) => '$nameFormatting$flag$reset').join(', ');
+        flags = ' or $formattedFlags';
+      }
+    }
     // Don't show inline (default) marker anymore - we'll print default as a separate line
     final description = switchCommand.description != null ? ': $gray${switchCommand.description}$reset' : '';
 

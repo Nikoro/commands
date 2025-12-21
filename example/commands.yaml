@@ -1,9 +1,1619 @@
-        hello: ## Description of command hello
+## ============================================================================
+## PRESERVED COMMANDS (DO NOT MODIFY)
+## ============================================================================
+hello: ## Prints "Hello World"
+  script: echo "Hello World"
+
+d:
+  script: |
+    dart ...args
+
+test:
+  override: false
+  script: |
+    echo "test overridden"
+
+make:
+  override: true
+  script: |
+    echo "make overridden"          
+
+invalid!:
+
+invalid_quoted_int: ## Invalid: quoted default with explicit int type
+  script: echo "port={port}"
+  params:
+    optional:
+      - port: '-p, --port'
+        type: int
+        default: "3000"
+
+invalid_quoted_double: ## Invalid: quoted default with explicit double type
+  script: echo "timeout={timeout}"
+  params:
+    optional:
+      - timeout: '-t, --timeout'
+        type: double
+        default: "30.0"
+
+invalid_string_int: ## Invalid: explicit string type with unquoted int default
+  script: echo "code={code}"
+  params:
+    optional:
+      - code: '-c, --code'
+        type: string
+        default: 123
+
+invalid_string_double: ## Invalid: explicit string type with unquoted double default
+  script: echo "version={version}"
+  params:
+    optional:
+      - version: '-v, --version'
+        type: string
+        default: 1.5
+
+invalid_script_and_switch: ## Invalid: has both script and switch defined
+  script: echo "This should not work"
+  switch:
+    - opt1:
+      script: echo "Option 1"
+    - opt2:
+      script: echo "Option 2"
+    - default: opt1
+
+## ============================================================================
+## ERROR TEST CASES
+## ============================================================================
+
+# Test: Missing required named param
+err_missing_named_req: ## Test missing required named param
+  script: |
+    echo "Required: {req}"
+  params:
+    required:
+      - req: '-r, --required'
+
+# Test: Missing required positional param
+err_missing_positional_req: ## Test missing required positional param
+  script: |
+    echo "Required: {req}"
+  params:
+    required:
+      - req:
+
+# Test: Missing multiple required params
+err_missing_multiple_req: ## Test missing multiple required params
+  script: |
+    echo "X: {x}, Y: {y}, Z: {z}"
+  params:
+    required:
+      - x: '-x, --xray'
+      - y: '-y, --yankee'
+      - z: '-z, --zulu'
+
+# Test: Switch with missing required param in option
+err_switch_missing_param: ## Test switch with missing required param
+  switch:
+    - opt1:
+      script: |
+        echo "Opt1: {req}"
+      params:
+        required:
+          - req: '-r, --required'
+    - opt2:
+      script: echo "Option 2"
+    - default: opt2
+
+# Test: Nested switch with missing param
+err_nested_missing_param: ## Test nested switch with missing param
+  switch:
+    - parent1:
+      switch:
+        - child1:
+          script: |
+            echo "P1C1: {req}"
+          params:
+            required:
+              - req: '-r, --required'
+        - child2:
+          script: echo "P1C2"
+        - default: child1
+    - default: parent1
+
+# Test: Mixed positional and named params with errors
+err_mixed_params_missing: ## Test mixed params missing values
+  script: |
+    echo "R1: {r1}, R2: {r2}, O1: {o1}, O2: {o2}"
+  params:
+    required:
+      - r1: '-r, --req1'
+      - r2:
+    optional:
+      - o1:
+        default: "o1"
+      - o2: '-o, --opt2'
+        default: "o2"
+
+# Test: Deep nested switch with errors
+err_deep_nested_error: ## Test deep nested with errors
+  switch:
+    - level1:
+      switch:
+        - level2:
           switch:
-            - opt1:
-              script: echo "Option 1"
-            - opt2: ## Description of option 2
-              script: echo "Option 2"
-            - opt3:
-              script: echo "Option 3"
-    
+            - level3:
+              script: |
+                echo "Deep: {req}"
+              params:
+                required:
+                  - req: '-r, --required'
+            - default: level3
+        - default: level2
+    - default: level1
+
+# Test: Command with both named and positional required params
+err_hybrid_missing: ## Test hybrid params missing
+  script: |
+    echo "Named: {named}, Positional: {pos}"
+  params:
+    required:
+      - named: '-n, --named'
+      - pos:
+
+## ============================================================================
+## LEVEL 1: Simple Scripts (No Params, No Switches)
+## ============================================================================
+
+s1_no_comment:
+  script: echo "Simple script without comment"
+
+s2_with_comment: ## Simple script with description
+  script: echo "Simple script with comment"
+
+## ============================================================================
+## LEVEL 2: Scripts with Params - All Optional with Defaults (NAMED)
+## ============================================================================
+
+p1_single_named_opt_no_comment:
+  script: |
+    echo "Value: {val}"
+  params:
+    optional:
+      - val: '-v, --value, va'
+        default: "default1"
+
+p2_single_named_opt_with_comment: ## Script with one optional named param
+  script: |
+    echo "Value: {val}"
+  params:
+    optional:
+      - val: 'va, --value, -v' ## The value parameter
+        default: "default2"
+
+p3_multi_named_opt_no_comment:
+  script: |
+    echo "A: {a}, B: {b}, C: {c}"
+  params:
+    optional:
+      - a: '-a, --alpha'
+        default: "A1"
+      - b: '--beta, -b'
+        default: "B1"
+      - c: '-c, --charlie'
+        default: "C1"
+
+p4_multi_named_opt_partial_comment: ## Multiple optional named params with some comments
+  script: |
+    echo "A: {a}, B: {b}, C: {c}"
+  params:
+    optional:
+      - a: '-a, --alpha' ## Alpha parameter
+        default: "A2"
+      - b: '-b, --beta'
+        default: "B2"
+      - c: '-c, --charlie' ## Charlie parameter
+        default: "C2"
+
+p5_multi_named_opt_all_comment: ## Multiple optional named params all commented
+  script: |
+    echo "A: {a}, B: {b}, C: {c}"
+  params:
+    optional:
+      - a: '-a, --alpha' ## Alpha parameter
+        default: "A3"
+      - b: '-b, --beta' ## Beta parameter
+        default: "B3"
+      - c: '-c, --charlie' ## Charlie parameter
+        default: "C3"
+
+## ============================================================================
+## LEVEL 2b: Scripts with Params - All Optional with Defaults (POSITIONAL)
+## ============================================================================
+
+p1_single_positional_opt_no_comment:
+  script: |
+    echo "Value: {val}"
+  params:
+    optional:
+      - val:
+        default: "default1"
+
+p2_single_positional_opt_with_comment: ## Script with one optional positional param
+  script: |
+    echo "Value: {val}"
+  params:
+    optional:
+      - val: ## The value parameter
+        default: "default2"
+
+p3_multi_positional_opt_no_comment:
+  script: |
+    echo "A: {a}, B: {b}, C: {c}"
+  params:
+    optional:
+      - a:
+        default: "A1"
+      - b:
+        default: "B1"
+      - c:
+        default: "C1"
+
+p4_multi_positional_opt_partial_comment: ## Multiple optional positional params with some comments
+  script: |
+    echo "A: {a}, B: {b}, C: {c}"
+  params:
+    optional:
+      - a: ## Alpha parameter
+        default: "A2"
+      - b:
+        default: "B2"
+      - c: ## Charlie parameter
+        default: "C2"
+
+p5_multi_positional_opt_all_comment: ## Multiple optional positional params all commented
+  script: |
+    echo "A: {a}, B: {b}, C: {c}"
+  params:
+    optional:
+      - a: ## Alpha parameter
+        default: "A3"
+      - b: ## Beta parameter
+        default: "B3"
+      - c: ## Charlie parameter
+        default: "C3"
+
+## ============================================================================
+## LEVEL 3: Scripts with Params - All Required (No Defaults) (NAMED)
+## ============================================================================
+
+p6_single_named_req_no_comment:
+  script: |
+    echo "Required: {req}"
+  params:
+    required:
+      - req: '-r, --required'
+
+p7_single_named_req_with_comment: ## Script with one required named param
+  script: |
+    echo "Required: {req}"
+  params:
+    required:
+      - req: '-r, --required' ## Required parameter
+
+p8_multi_named_req_no_comment:
+  script: |
+    echo "X: {x}, Y: {y}, Z: {z}"
+  params:
+    required:
+      - x: '-x, --xray'
+      - y: '-y, --yankee'
+      - z: '-z, --zulu'
+
+p9_multi_named_req_partial_comment: ## Multiple required named params partial comments
+  script: |
+    echo "X: {x}, Y: {y}, Z: {z}"
+  params:
+    required:
+      - x: '-x, --xray' ## X parameter
+      - y: '-y, --yankee'
+      - z: '-z, --zulu' ## Z parameter
+
+p10_multi_named_req_all_comment: ## Multiple required named params all commented
+  script: |
+    echo "X: {x}, Y: {y}, Z: {z}"
+  params:
+    required:
+      - x: '-x, --xray' ## X parameter
+      - y: '-y, --yankee' ## Y parameter
+      - z: '-z, --zulu' ## Z parameter
+
+## ============================================================================
+## LEVEL 3b: Scripts with Params - All Required (No Defaults) (POSITIONAL)
+## ============================================================================
+
+p6_single_positional_req_no_comment:
+  script: |
+    echo "Required: {req}"
+  params:
+    required:
+      - req:
+
+p7_single_positional_req_with_comment: ## Script with one required positional param
+  script: |
+    echo "Required: {req}"
+  params:
+    required:
+      - req: ## Required parameter
+
+p8_multi_positional_req_no_comment:
+  script: |
+    echo "X: {x}, Y: {y}, Z: {z}"
+  params:
+    required:
+      - x:
+      - y:
+      - z:
+
+p9_multi_positional_req_partial_comment: ## Multiple required positional params partial comments
+  script: |
+    echo "X: {x}, Y: {y}, Z: {z}"
+  params:
+    required:
+      - x: ## X parameter
+      - y:
+      - z: ## Z parameter
+
+p10_multi_positional_req_all_comment: ## Multiple required positional params all commented
+  script: |
+    echo "X: {x}, Y: {y}, Z: {z}"
+  params:
+    required:
+      - x: ## X parameter
+      - y: ## Y parameter
+      - z: ## Z parameter
+
+## ============================================================================
+## LEVEL 4: Scripts with Params - Mixed Required/Optional (NAMED)
+## ============================================================================
+
+p11_mix_named_req_first_no_comment:
+  script: |
+    echo "Req: {req}, Opt: {opt}"
+  params:
+    required:
+      - req: '-r, --required'
+    optional:
+      - opt: '-o, --optional'
+        default: "opt1"
+
+p12_mix_named_req_first_partial_comment: ## Mixed named params with partial comments
+  script: |
+    echo "Req: {req}, Opt: {opt}"
+  params:
+    required:
+      - req: '-r, --required' ## Required param
+    optional:
+      - opt: '-o, --optional'
+        default: "opt2"
+
+p13_mix_named_req_first_all_comment: ## Mixed named params all commented
+  script: |
+    echo "Req: {req}, Opt: {opt}"
+  params:
+    required:
+      - req: '-r, --required' ## Required param
+    optional:
+      - opt: '-o, --optional' ## Optional param
+        default: "opt3"
+
+p14_mix_named_opt_first_no_comment:
+  script: |
+    echo "Opt: {opt}, Req: {req}"
+  params:
+    optional:
+      - opt: '-o, --optional'
+        default: "opt4"
+    required:
+      - req: '-r, --required'
+
+p15_mix_named_opt_first_all_comment: ## Optional then required all commented
+  script: |
+    echo "Opt: {opt}, Req: {req}"
+  params:
+    optional:
+      - opt: '-o, --optional' ## Optional param
+        default: "opt5"
+    required:
+      - req: '-r, --required' ## Required param
+
+## ============================================================================
+## LEVEL 4b: Scripts with Params - Mixed Required/Optional (POSITIONAL)
+## ============================================================================
+
+p11_mix_positional_req_first_no_comment:
+  script: |
+    echo "Req: {req}, Opt: {opt}"
+  params:
+    required:
+      - req:
+    optional:
+      - opt:
+        default: "opt1"
+
+p12_mix_positional_req_first_partial_comment: ## Mixed positional params with partial comments
+  script: |
+    echo "Req: {req}, Opt: {opt}"
+  params:
+    required:
+      - req: ## Required param
+    optional:
+      - opt:
+        default: "opt2"
+
+p13_mix_positional_req_first_all_comment: ## Mixed positional params all commented
+  script: |
+    echo "Req: {req}, Opt: {opt}"
+  params:
+    required:
+      - req: ## Required param
+    optional:
+      - opt: ## Optional param
+        default: "opt3"
+
+p14_mix_positional_opt_first_no_comment:
+  script: |
+    echo "Opt: {opt}, Req: {req}"
+  params:
+    optional:
+      - opt:
+        default: "opt4"
+    required:
+      - req:
+
+p15_mix_positional_opt_first_all_comment: ## Optional then required all commented
+  script: |
+    echo "Opt: {opt}, Req: {req}"
+  params:
+    optional:
+      - opt: ## Optional param
+        default: "opt5"
+    required:
+      - req: ## Required param
+
+## ============================================================================
+## LEVEL 4c: Scripts with Params - Mixed Required/Optional (MIXED NAMED/POSITIONAL)
+## ============================================================================
+
+p16_mix_hybrid_req_named_opt_positional: ## Named required, positional optional
+  script: |
+    echo "Req: {req}, Opt: {opt}"
+  params:
+    required:
+      - req: '-r, --required' ## Required named param
+    optional:
+      - opt: ## Optional positional param
+        default: "opt1"
+
+p17_mix_hybrid_req_positional_opt_named: ## Positional required, named optional
+  script: |
+    echo "Req: {req}, Opt: {opt}"
+  params:
+    required:
+      - req: ## Required positional param
+    optional:
+      - opt: '-o, --optional' ## Optional named param
+        default: "opt2"
+
+p18_mix_hybrid_multi_params: ## Multiple mixed params
+  script: |
+    echo "R1: {r1}, R2: {r2}, O1: {o1}, O2: {o2}"
+  params:
+    required:
+      - r1: '-r, --req1' ## Named required
+      - r2: ## Positional required
+    optional:
+      - o1: ## Positional optional
+        default: "o1"
+      - o2: '-o, --opt2' ## Named optional
+        default: "o2"
+
+## ============================================================================
+## LEVEL 5: Switch Commands - All Options with Defaults
+## ============================================================================
+
+sw1_default_no_comment:
+  switch:
+    - opt1:
+      script: echo "Option 1"
+    - opt2:
+      script: echo "Option 2"
+    - opt3:
+      script: echo "Option 3"
+    - default: opt1
+
+sw2_default_partial_comment: ## Switch with default and partial comments
+  switch:
+    - opt1: ## First option
+      script: echo "Option 1"
+    - opt2:
+      script: echo "Option 2"
+    - opt3: ## Third option
+      script: echo "Option 3"
+    - default: opt2
+
+sw3_default_all_comment: ## Switch with default all options commented
+  switch:
+    - opt1: ## First option
+      script: echo "Option 1"
+    - opt2: ## Second option
+      script: echo "Option 2"
+    - opt3: ## Third option
+      script: echo "Option 3"
+    - default: opt3
+
+## ============================================================================
+## LEVEL 6: Switch Commands - No Defaults (Interactive Menu)
+## ============================================================================
+
+sw4_menu_no_comment:
+  switch:
+    - opt1:
+      script: echo "Menu Option 1"
+    - opt2:
+      script: echo "Menu Option 2"
+    - opt3:
+      script: echo "Menu Option 3"
+
+sw5_menu_partial_comment: ## Interactive menu with partial comments
+  switch:
+    - opt1: ## First menu option
+      script: echo "Menu Option 1"
+    - opt2:
+      script: echo "Menu Option 2"
+    - opt3: ## Third menu option
+      script: echo "Menu Option 3"
+
+sw6_menu_all_comment: ## Interactive menu all options commented
+  switch:
+    - opt1: ## First menu option
+      script: echo "Menu Option 1"
+    - opt2: ## Second menu option
+      script: echo "Menu Option 2"
+    - opt3: ## Third menu option
+      script: echo "Menu Option 3"
+
+## ============================================================================
+## LEVEL 7: Switch Commands with Params - Options with Defaults (NAMED)
+## ============================================================================
+
+sw7_default_single_named_param_no_comment:
+  switch:
+    - opt1:
+      script: |
+        echo "Opt1: {val}"
+      params:
+        optional:
+          - val: '-v, --value'
+            default: "v1"
+    - opt2:
+      script: |
+        echo "Opt2: {val}"
+      params:
+        optional:
+          - val: '-v, --value'
+            default: "v2"
+    - default: opt1
+
+sw8_default_single_named_param_with_comment: ## Switch with default and named params commented
+  switch:
+    - opt1: ## First option
+      script: |
+        echo "Opt1: {val}"
+      params:
+        optional:
+          - val: '-v, --value' ## Value param
+            default: "v1"
+    - opt2: ## Second option
+      script: |
+        echo "Opt2: {val}"
+      params:
+        optional:
+          - val: '-v, --value' ## Value param
+            default: "v2"
+    - default: opt1
+
+sw9_default_multi_named_param_no_comment:
+  switch:
+    - opt1:
+      script: |
+        echo "Opt1: {a}, {b}"
+      params:
+        optional:
+          - a: '-a, --alpha'
+            default: "A1"
+          - b: '-b, --beta'
+            default: "B1"
+    - opt2:
+      script: |
+        echo "Opt2: {a}, {b}"
+      params:
+        optional:
+          - a: '-a, --alpha'
+            default: "A2"
+          - b: '-b, --beta'
+            default: "B2"
+    - default: opt2
+
+sw10_default_multi_named_param_mixed_comment: ## Switch with multi named params mixed comments
+  switch:
+    - opt1: ## First option
+      script: |
+        echo "Opt1: {a}, {b}"
+      params:
+        optional:
+          - a: '-a, --alpha' ## Alpha param
+            default: "A1"
+          - b: '-b, --beta'
+            default: "B1"
+    - opt2:
+      script: |
+        echo "Opt2: {a}, {b}"
+      params:
+        optional:
+          - a: '-a, --alpha'
+            default: "A2"
+          - b: '-b, --beta' ## Beta param
+            default: "B2"
+    - default: opt1
+
+sw11_default_named_req_opt_params: ## Switch with named required and optional params
+  switch:
+    - opt1: ## First option
+      script: |
+        echo "Opt1: {req}, {opt}"
+      params:
+        required:
+          - req: '-r, --required' ## Required param
+        optional:
+          - opt: '-o, --optional' ## Optional param
+            default: "opt1"
+    - opt2: ## Second option
+      script: |
+        echo "Opt2: {req}, {opt}"
+      params:
+        required:
+          - req: '-r, --required' ## Required param
+        optional:
+          - opt: '-o, --optional' ## Optional param
+            default: "opt2"
+    - default: opt2
+
+## ============================================================================
+## LEVEL 7b: Switch Commands with Params - Options with Defaults (POSITIONAL)
+## ============================================================================
+
+sw7_default_single_positional_param_no_comment:
+  switch:
+    - opt1:
+      script: |
+        echo "Opt1: {val}"
+      params:
+        optional:
+          - val:
+            default: "v1"
+    - opt2:
+      script: |
+        echo "Opt2: {val}"
+      params:
+        optional:
+          - val:
+            default: "v2"
+    - default: opt1
+
+sw8_default_single_positional_param_with_comment: ## Switch with default and positional params commented
+  switch:
+    - opt1: ## First option
+      script: |
+        echo "Opt1: {val}"
+      params:
+        optional:
+          - val: ## Value param
+            default: "v1"
+    - opt2: ## Second option
+      script: |
+        echo "Opt2: {val}"
+      params:
+        optional:
+          - val: ## Value param
+            default: "v2"
+    - default: opt1
+
+sw9_default_multi_positional_param_no_comment:
+  switch:
+    - opt1:
+      script: |
+        echo "Opt1: {a}, {b}"
+      params:
+        optional:
+          - a:
+            default: "A1"
+          - b:
+            default: "B1"
+    - opt2:
+      script: |
+        echo "Opt2: {a}, {b}"
+      params:
+        optional:
+          - a:
+            default: "A2"
+          - b:
+            default: "B2"
+    - default: opt2
+
+sw10_default_multi_positional_param_mixed_comment: ## Switch with multi positional params mixed comments
+  switch:
+    - opt1: ## First option
+      script: |
+        echo "Opt1: {a}, {b}"
+      params:
+        optional:
+          - a: ## Alpha param
+            default: "A1"
+          - b:
+            default: "B1"
+    - opt2:
+      script: |
+        echo "Opt2: {a}, {b}"
+      params:
+        optional:
+          - a:
+            default: "A2"
+          - b: ## Beta param
+            default: "B2"
+    - default: opt1
+
+sw11_default_positional_req_opt_params: ## Switch with positional required and optional params
+  switch:
+    - opt1: ## First option
+      script: |
+        echo "Opt1: {req}, {opt}"
+      params:
+        required:
+          - req: ## Required param
+        optional:
+          - opt: ## Optional param
+            default: "opt1"
+    - opt2: ## Second option
+      script: |
+        echo "Opt2: {req}, {opt}"
+      params:
+        required:
+          - req: ## Required param
+        optional:
+          - opt: ## Optional param
+            default: "opt2"
+    - default: opt2
+
+## ============================================================================
+## LEVEL 7c: Switch Commands with Params - Mixed Named/Positional with Defaults
+## ============================================================================
+
+sw12_default_hybrid_params: ## Switch with mixed named/positional params
+  switch:
+    - opt1: ## First option - named req, positional opt
+      script: |
+        echo "Opt1: {req}, {opt}"
+      params:
+        required:
+          - req: '-r, --required' ## Named required
+        optional:
+          - opt: ## Positional optional
+            default: "opt1"
+    - opt2: ## Second option - positional req, named opt
+      script: |
+        echo "Opt2: {req}, {opt}"
+      params:
+        required:
+          - req: ## Positional required
+        optional:
+          - opt: '-o, --optional' ## Named optional
+            default: "opt2"
+    - default: opt1
+
+## ============================================================================
+## LEVEL 8: Switch Commands with Params - No Defaults (Interactive Menu) (NAMED)
+## ============================================================================
+
+sw13_menu_single_named_param_no_comment:
+  switch:
+    - opt1:
+      script: |
+        echo "Menu Opt1: {val}"
+      params:
+        optional:
+          - val: '-v, --value'
+            default: "v1"
+    - opt2:
+      script: |
+        echo "Menu Opt2: {val}"
+      params:
+        optional:
+          - val: '-v, --value'
+            default: "v2"
+
+sw14_menu_multi_named_param_partial_comment: ## Interactive menu with named params partial comments
+  switch:
+    - opt1: ## First option
+      script: |
+        echo "Menu Opt1: {a}, {b}"
+      params:
+        optional:
+          - a: '-a, --alpha'
+            default: "A1"
+          - b: '-b, --beta' ## Beta param
+            default: "B1"
+    - opt2:
+      script: |
+        echo "Menu Opt2: {a}, {b}"
+      params:
+        optional:
+          - a: '-a, --alpha' ## Alpha param
+            default: "A2"
+          - b: '-b, --beta'
+            default: "B2"
+
+sw15_menu_mixed_named_params: ## Interactive menu with mixed named param types
+  switch:
+    - opt1: ## Option with required param
+      script: |
+        echo "Menu Opt1: {req}"
+      params:
+        required:
+          - req: '-r, --required' ## Required param
+    - opt2: ## Option with optional param
+      script: |
+        echo "Menu Opt2: {opt}"
+      params:
+        optional:
+          - opt: '-o, --optional' ## Optional param
+            default: "opt2"
+    - opt3: ## Option without params
+      script: echo "Menu Opt3"
+
+## ============================================================================
+## LEVEL 8b: Switch Commands with Params - No Defaults (Interactive Menu) (POSITIONAL)
+## ============================================================================
+
+sw13_menu_single_positional_param_no_comment:
+  switch:
+    - opt1:
+      script: |
+        echo "Menu Opt1: {val}"
+      params:
+        optional:
+          - val:
+            default: "v1"
+    - opt2:
+      script: |
+        echo "Menu Opt2: {val}"
+      params:
+        optional:
+          - val:
+            default: "v2"
+
+sw14_menu_multi_positional_param_partial_comment: ## Interactive menu with positional params partial comments
+  switch:
+    - opt1: ## First option
+      script: |
+        echo "Menu Opt1: {a}, {b}"
+      params:
+        optional:
+          - a:
+            default: "A1"
+          - b: ## Beta param
+            default: "B1"
+    - opt2:
+      script: |
+        echo "Menu Opt2: {a}, {b}"
+      params:
+        optional:
+          - a: ## Alpha param
+            default: "A2"
+          - b:
+            default: "B2"
+
+sw15_menu_mixed_positional_params: ## Interactive menu with mixed positional param types
+  switch:
+    - opt1: ## Option with required param
+      script: |
+        echo "Menu Opt1: {req}"
+      params:
+        required:
+          - req: ## Required param
+    - opt2: ## Option with optional param
+      script: |
+        echo "Menu Opt2: {opt}"
+      params:
+        optional:
+          - opt: ## Optional param
+            default: "opt2"
+    - opt3: ## Option without params
+      script: echo "Menu Opt3"
+
+## ============================================================================
+## LEVEL 8c: Switch Commands with Params - No Defaults (Mixed Named/Positional)
+## ============================================================================
+
+sw16_menu_hybrid_params: ## Interactive menu with mixed named/positional params
+  switch:
+    - opt1: ## Named required param
+      script: |
+        echo "Menu Opt1: {req}"
+      params:
+        required:
+          - req: '-r, --required' ## Required named
+    - opt2: ## Positional optional param
+      script: |
+        echo "Menu Opt2: {opt}"
+      params:
+        optional:
+          - opt: ## Optional positional
+            default: "opt2"
+    - opt3: ## Mixed params
+      script: |
+        echo "Menu Opt3: {req}, {opt}"
+      params:
+        required:
+          - req: ## Positional required
+        optional:
+          - opt: '-o, --optional' ## Named optional
+            default: "opt3"
+
+## ============================================================================
+## LEVEL 9: Nested Switches - Simple (1 Level Deep)
+## ============================================================================
+
+nest1_default_no_comment:
+  switch:
+    - parent1:
+      switch:
+        - child1:
+          script: echo "Parent1 Child1"
+        - child2:
+          script: echo "Parent1 Child2"
+        - default: child1
+    - parent2:
+      switch:
+        - child1:
+          script: echo "Parent2 Child1"
+        - child2:
+          script: echo "Parent2 Child2"
+        - default: child2
+    - default: parent1
+
+nest2_default_with_comment: ## Nested switches with comments
+  switch:
+    - parent1: ## First parent
+      switch:
+        - child1: ## First child
+          script: echo "Parent1 Child1"
+        - child2: ## Second child
+          script: echo "Parent1 Child2"
+        - default: child1
+    - parent2: ## Second parent
+      switch:
+        - child1: ## First child
+          script: echo "Parent2 Child1"
+        - child2: ## Second child
+          script: echo "Parent2 Child2"
+        - default: child2
+    - default: parent2
+
+nest3_menu_no_comment:
+  switch:
+    - parent1:
+      switch:
+        - child1:
+          script: echo "Menu Parent1 Child1"
+        - child2:
+          script: echo "Menu Parent1 Child2"
+    - parent2:
+      switch:
+        - child1:
+          script: echo "Menu Parent2 Child1"
+        - child2:
+          script: echo "Menu Parent2 Child2"
+
+nest4_menu_with_comment: ## Nested interactive menu with comments
+  switch:
+    - parent1: ## First parent
+      switch:
+        - child1: ## First child
+          script: echo "Menu Parent1 Child1"
+        - child2: ## Second child
+          script: echo "Menu Parent1 Child2"
+    - parent2: ## Second parent
+      switch:
+        - child1: ## First child
+          script: echo "Menu Parent2 Child1"
+        - child2: ## Second child
+          script: echo "Menu Parent2 Child2"
+
+## ============================================================================
+## LEVEL 10: Nested Switches with Params (NAMED)
+## ============================================================================
+
+nest5_default_named_params_no_comment:
+  switch:
+    - parent1:
+      switch:
+        - child1:
+          script: |
+            echo "P1C1: {val}"
+          params:
+            optional:
+              - val: '-v, --value'
+                default: "p1c1"
+        - child2:
+          script: |
+            echo "P1C2: {val}"
+          params:
+            optional:
+              - val: '-v, --value'
+                default: "p1c2"
+        - default: child1
+    - default: parent1
+
+nest6_default_named_params_with_comment: ## Nested with named params all commented
+  switch:
+    - parent1: ## First parent
+      switch:
+        - child1: ## First child
+          script: |
+            echo "P1C1: {val}"
+          params:
+            optional:
+              - val: '-v, --value' ## Value param
+                default: "p1c1"
+        - child2: ## Second child
+          script: |
+            echo "P1C2: {val}"
+          params:
+            optional:
+              - val: '-v, --value' ## Value param
+                default: "p1c2"
+        - default: child2
+    - default: parent1
+
+nest7_menu_named_params_mixed: ## Nested menu with mixed named params and comments
+  switch:
+    - parent1: ## First parent with required param
+      switch:
+        - child1:
+          script: |
+            echo "P1C1: {req}"
+          params:
+            required:
+              - req: '-r, --required' ## Required param
+        - child2: ## Second child with optional param
+          script: |
+            echo "P1C2: {opt}"
+          params:
+            optional:
+              - opt: '-o, --optional'
+                default: "p1c2opt"
+    - parent2:
+      switch:
+        - child1: ## Child without params
+          script: echo "P2C1"
+        - child2:
+          script: |
+            echo "P2C2: {val}"
+          params:
+            optional:
+              - val: '-v, --value'
+                default: "p2c2"
+
+## ============================================================================
+## LEVEL 10b: Nested Switches with Params (POSITIONAL)
+## ============================================================================
+
+nest5_default_positional_params_no_comment:
+  switch:
+    - parent1:
+      switch:
+        - child1:
+          script: |
+            echo "P1C1: {val}"
+          params:
+            optional:
+              - val:
+                default: "p1c1"
+        - child2:
+          script: |
+            echo "P1C2: {val}"
+          params:
+            optional:
+              - val:
+                default: "p1c2"
+        - default: child1
+    - default: parent1
+
+nest6_default_positional_params_with_comment: ## Nested with positional params all commented
+  switch:
+    - parent1: ## First parent
+      switch:
+        - child1: ## First child
+          script: |
+            echo "P1C1: {val}"
+          params:
+            optional:
+              - val: ## Value param
+                default: "p1c1"
+        - child2: ## Second child
+          script: |
+            echo "P1C2: {val}"
+          params:
+            optional:
+              - val: ## Value param
+                default: "p1c2"
+        - default: child2
+    - default: parent1
+
+nest7_menu_positional_params_mixed: ## Nested menu with mixed positional params and comments
+  switch:
+    - parent1: ## First parent with required param
+      switch:
+        - child1:
+          script: |
+            echo "P1C1: {req}"
+          params:
+            required:
+              - req: ## Required param
+        - child2: ## Second child with optional param
+          script: |
+            echo "P1C2: {opt}"
+          params:
+            optional:
+              - opt:
+                default: "p1c2opt"
+    - parent2:
+      switch:
+        - child1: ## Child without params
+          script: echo "P2C1"
+        - child2:
+          script: |
+            echo "P2C2: {val}"
+          params:
+            optional:
+              - val:
+                default: "p2c2"
+
+## ============================================================================
+## LEVEL 10c: Nested Switches with Params (MIXED NAMED/POSITIONAL)
+## ============================================================================
+
+nest8_hybrid_params: ## Nested with mixed named/positional params
+  switch:
+    - parent1: ## Parent with named params
+      switch:
+        - child1: ## Named required
+          script: |
+            echo "P1C1: {req}"
+          params:
+            required:
+              - req: '-r, --required' ## Named required param
+        - child2: ## Positional optional
+          script: |
+            echo "P1C2: {opt}"
+          params:
+            optional:
+              - opt: ## Positional optional param
+                default: "p1c2"
+        - default: child1
+    - parent2: ## Parent with positional params
+      switch:
+        - child1: ## Positional required
+          script: |
+            echo "P2C1: {req}"
+          params:
+            required:
+              - req: ## Positional required param
+        - child2: ## Named optional
+          script: |
+            echo "P2C2: {opt}"
+          params:
+            optional:
+              - opt: '-o, --optional' ## Named optional param
+                default: "p2c2"
+        - default: child2
+    - default: parent1
+
+## ============================================================================
+## LEVEL 11: Deeply Nested Switches (2+ Levels)
+## ============================================================================
+
+nest8_deep_default: ## 2-level nested with defaults
+  switch:
+    - level1:
+      switch:
+        - level2a:
+          switch:
+            - level3a:
+              script: echo "L1 L2a L3a"
+            - level3b:
+              script: echo "L1 L2a L3b"
+            - default: level3a
+        - level2b:
+          switch:
+            - level3a:
+              script: echo "L1 L2b L3a"
+            - level3b:
+              script: echo "L1 L2b L3b"
+            - default: level3b
+        - default: level2a
+    - default: level1
+
+nest9_deep_menu: ## 2-level nested interactive menu
+  switch:
+    - level1:
+      switch:
+        - level2a:
+          switch:
+            - level3a:
+              script: echo "Menu L1 L2a L3a"
+            - level3b:
+              script: echo "Menu L1 L2a L3b"
+        - level2b:
+          switch:
+            - level3a:
+              script: echo "Menu L1 L2b L3a"
+            - level3b:
+              script: echo "Menu L1 L2b L3b"
+
+nest10_deep_mixed_named: ## 2-level nested mixed defaults/menus with named params
+  switch:
+    - level1: ## First level1
+      switch:
+        - level2a: ## Has default
+          switch:
+            - level3a: ## With named param
+              script: |
+                echo "L1 L2a L3a: {val}"
+              params:
+                optional:
+                  - val: '-v, --value'
+                    default: "l3a"
+            - level3b:
+              script: echo "L1 L2a L3b"
+            - default: level3a
+        - level2b: ## No default (menu)
+          switch:
+            - level3a:
+              script: echo "L1 L2b L3a"
+            - level3b:
+              script: echo "L1 L2b L3b"
+        - default: level2a
+    - default: level1
+
+nest10_deep_mixed_positional: ## 2-level nested mixed defaults/menus with positional params
+  switch:
+    - level1: ## First level1
+      switch:
+        - level2a: ## Has default
+          switch:
+            - level3a: ## With positional param
+              script: |
+                echo "L1 L2a L3a: {val}"
+              params:
+                optional:
+                  - val: ## Positional value param
+                    default: "l3a"
+            - level3b:
+              script: echo "L1 L2a L3b"
+            - default: level3a
+        - level2b: ## No default (menu)
+          switch:
+            - level3a:
+              script: echo "L1 L2b L3a"
+            - level3b:
+              script: echo "L1 L2b L3b"
+        - default: level2a
+    - default: level1
+
+nest11_deep_hybrid: ## 2-level nested with mixed named/positional params
+  switch:
+    - level1: ## First level1 with named params
+      switch:
+        - level2a: ## Has default with named req param
+          switch:
+            - level3a: ## Named required
+              script: |
+                echo "L1 L2a L3a: {req}"
+              params:
+                required:
+                  - req: '-r, --required' ## Named required param
+            - level3b: ## Named optional
+              script: |
+                echo "L1 L2a L3b: {opt}"
+              params:
+                optional:
+                  - opt: '-o, --optional' ## Named optional param
+                    default: "l3b"
+            - default: level3a
+        - level2b: ## Positional params
+          switch:
+            - level3a: ## Positional required
+              script: |
+                echo "L1 L2b L3a: {req}"
+              params:
+                required:
+                  - req: ## Positional required param
+            - level3b: ## Positional optional
+              script: |
+                echo "L1 L2b L3b: {opt}"
+              params:
+                optional:
+                  - opt: ## Positional optional param
+                    default: "l3b"
+        - default: level2a
+    - default: level1
+
+## ============================================================================
+## PARAMETER TYPE SYSTEM TESTS
+## ============================================================================
+
+type_bool_flags: ## Test boolean flags
+  script: echo "verbose={verbose} debug={debug}"
+  params:
+    optional:
+      - verbose: '-v, --verbose'
+        default: false
+      - debug: '-d, --debug'
+        default: true
+
+type_enum_with_default: ## Test enum with default
+  script: echo "env={env}"
+  params:
+    optional:
+      - env: '-e, --environment'
+        values: [dev, staging, prod]
+        default: staging
+
+type_enum_no_default: ## Test enum without default (picker)
+  script: echo "target={target}"
+  params:
+    optional:
+      - target: '-t, --target'
+        description: 'Select target'
+        values: [ios, android, web]
+
+type_numeric_types: ## Test int and double
+  script: echo "port={port} timeout={timeout}"
+  params:
+    optional:
+      - port: '-p, --port'
+        type: int
+        default: 3000
+      - timeout: '--timeout'
+        type: double
+        default: 30.0
+
+type_mixed_types: ## Test all types together
+  script: echo "env={env} replicas={replicas} timeout={timeout} verbose={verbose}"
+  params:
+    optional:
+      - env: '-e, --environment'
+        values: [dev, staging, prod]
+        default: staging
+      - replicas: '-r, --replicas'
+        type: int
+        default: 3
+      - timeout: '-t, --timeout'
+        type: double
+        default: 30.5
+      - verbose: '-v, --verbose'
+        default: false
+
+type_inferred_int: ## Test inferred int type
+  script: echo "port={port} workers={workers}"
+  params:
+    optional:
+      - port: '-p, --port'
+        default: 8080
+      - workers: '-w, --workers'
+        default: 4
+
+type_inferred_double: ## Test inferred double type
+  script: echo "ratio={ratio} timeout={timeout}"
+  params:
+    optional:
+      - ratio: '-r, --ratio'
+        default: 0.5
+      - timeout: '-t, --timeout'
+        default: 30.0
+
+type_inferred_boolean: ## Test inferred boolean type
+  script: echo "enabled={enabled} verbose={verbose}"
+  params:
+    optional:
+      - enabled: '-e, --enabled'
+        default: true
+      - verbose: '-v, --verbose'
+        default: false
+
+type_inferred_string: ## Test inferred string type
+  script: echo "name={name} message={message}"
+  params:
+    optional:
+      - name: '-n, --name'
+        default: example
+      - message: '-m, --message'
+        default: hello world
+
+type_inferred_mixed: ## Test all inferred types together
+  script: echo "port={port} ratio={ratio} enabled={enabled} name={name}"
+  params:
+    optional:
+      - port: '-p, --port'
+        default: 3000
+      - ratio: '-r, --ratio'
+        default: 1.5
+      - enabled: '-e, --enabled'
+        default: true
+      - name: '-n, --name'
+        default: server
+
+type_quoted_int: ## Test quoted int becomes string
+  script: echo "port={port} count={count}"
+  params:
+    optional:
+      - port: '-p, --port'
+        default: "8080"
+      - count: '-c, --count'
+        default: '42'
+
+type_quoted_double: ## Test quoted double becomes string
+  script: echo "ratio={ratio} timeout={timeout}"
+  params:
+    optional:
+      - ratio: '-r, --ratio'
+        default: "0.75"
+      - timeout: '-t, --timeout'
+        default: '30.0'
+
+type_quoted_boolean: ## Test quoted boolean becomes string
+  script: echo "enabled={enabled} verbose={verbose}"
+  params:
+    optional:
+      - enabled: '-e, --enabled'
+        default: "true"
+      - verbose: '-v, --verbose'
+        default: 'false'
+
+type_quoted_inferred: ## Test quoted values become strings
+  script: echo "port={port} ratio={ratio}"
+  params:
+    optional:
+      - port: '-p, --port'
+        default: "9000"
+      - ratio: '-r, --ratio'
+        default: '2.5'
+
+type_explicit_string: ## Test explicit string type prevents inference
+  script: echo "code={code} version={version}"
+  params:
+    required:
+      - code: '-c, --code'
+        type: string
+      - version: '-v, --version'
+        type: string
+
+type_enum_required_positional: ## Test required positional enum without default
+  script: echo "platform={platform}"
+  params:
+    required:
+      - platform:
+        values: [Alpha, Bravo, Charlie]
+
+type_enum_required_named: ## Test required named enum without default (picker)
+  script: echo "platform={platform}"
+  params:
+    required:
+      - platform: '-p, --platform'
+        values: [ios, android, web]
+
+type_enum_optional_named: ## Test optional named enum without default (no picker)
+  script: echo "platform={platform}"
+  params:
+    optional:
+      - platform: '-p, --platform'
+        values: [ios, android, web]
+
+type_enum_optional_positional: ## Test optional positional enum without default (no picker)
+  script: echo "env={env}"
+  params:
+    optional:
+      - env:
+        values: [dev, staging, prod]
+
+## ============================================================================
+## TYPED ENUM TESTS
+## ============================================================================
+
+# Valid typed enum - all values are integers
+type_enum_int_valid: ## Test typed enum with valid int values
+  script: echo "level={level}"
+  params:
+    required:
+      - level: '-l, --level'
+        type: int
+        values: [1, 2, 3]
+        default: 1
+
+# Valid typed enum - string type (explicit)
+type_enum_string_explicit: ## Test typed enum with explicit string type
+  script: echo "platform={platform}"
+  params:
+    required:
+      - platform: '-p, --platform'
+        type: string
+        values: [ios, android, web]
+        default: ios
+
+# Valid typed enum - double type with integers (coercion)
+type_enum_double_with_int: ## Test typed enum double accepts integers
+  script: echo "ratio={ratio}"
+  params:
+    optional:
+      - ratio: '-r, --ratio'
+        type: double
+        values: [1, 2, 3]
+        default: 1
+
+# Valid typed enum - int type with whole number doubles
+type_enum_int_with_whole_doubles: ## Test typed enum int accepts whole doubles
+  script: echo "count={count}"
+  params:
+    optional:
+      - count: '-c, --count'
+        type: int
+        values: [1, 2.0, 3]
+        default: 2.0
+
+# No type specified - mixed values should work
+type_enum_no_type_mixed: ## Test enum without type allows mixed values
+  script: echo "value={value}"
+  params:
+    optional:
+      - value: '-v, --value'
+        values: [1, text, 3.3]
+        default: 1
+
+# Invalid typed enum - int type with string value (should fail at activation)
+invalid_typed_enum_int_string: ## Invalid: int enum with string value
+  script: echo "platform={platform}"
+  params:
+    required:
+      - platform: '-p, --platform'
+        type: int
+        values: [ios, 1, 2]
+
+# Invalid typed enum - int type with multiple invalid values
+invalid_typed_enum_int_multi: ## Invalid: int enum with string and double
+  script: echo "platform={platform}"
+  params:
+    required:
+      - platform:
+        type: int
+        values: [ios, 1, 2.2]
+
+# Invalid typed enum - int default is string
+invalid_typed_enum_int_default: ## Invalid: int enum with string default
+  script: echo "level={level}"
+  params:
+    required:
+      - level: '-l, --level'
+        type: int
+        values: [1, 2, 3]
+        default: text
