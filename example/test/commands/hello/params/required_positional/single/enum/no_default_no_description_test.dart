@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:commands_cli/colors.dart';
 import 'package:test/test.dart';
 
-import '../../../../../integration_tests.dart';
+import '../../../../../../integration_tests.dart';
 
 void main() {
   integrationTests(
@@ -11,7 +11,7 @@ void main() {
         hello:
           script: echo "Hello {name}"
           params:
-            optional:
+            required:
               - name:
                 values: [Alpha, Bravo, Charlie]
     ''',
@@ -23,12 +23,24 @@ void main() {
         });
       }
 
-      test('prints "Hello " when no optional param is specified', () async {
+      test('shows interactive picker when no required param is specified', () async {
         final result = await Process.run('hello', []);
-        expect(result.stdout, equals('Hello \n'));
+        expect(
+          result.stdout,
+          equals('''
+
+Select value for ${blue}name$reset:
+
+    ${green}1. Alpha   ✓$reset
+    2. Bravo    
+    3. Charlie  
+
+${gray}Press number (1-3) or press Esc to cancel:$reset
+'''),
+        );
       });
 
-      test('prints error when invalid value for optional param is specified', () async {
+      test('prints error when invalid value for required param is specified', () async {
         final result = await Process.run('hello', ['Delta']);
         expect(result.stderr, equals('''
 ❌ Parameter $bold${red}name$reset has invalid value: "Delta"
@@ -42,7 +54,7 @@ void main() {
           expect(result.stdout, equals('''
 ${blue}hello$reset
 params:
-  optional:
+  required:
     ${magenta}name$reset
     ${bold}values$reset: Alpha, Bravo, Charlie
 '''));

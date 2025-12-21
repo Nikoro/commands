@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:commands_cli/colors.dart';
 import 'package:test/test.dart';
 
-import '../../../../../integration_tests.dart';
+import '../../../../../../integration_tests.dart';
 
 void main() {
   integrationTests(

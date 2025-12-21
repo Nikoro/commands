@@ -3,16 +3,16 @@ import 'dart:io';
 import 'package:commands_cli/colors.dart';
 import 'package:test/test.dart';
 
-import '../../../../../integration_tests.dart';
+import '../../../../../../integration_tests.dart';
 
 void main() {
   integrationTests(
     '''
-        hello:
+        hello: ## Description of command hello
           script: echo "Hello {name}"
           params:
             required:
-              - name: -n
+              - name: -n ## Description of parameter name
                 values: [Alpha, Bravo, Charlie]
     ''',
     () {
@@ -30,6 +30,7 @@ void main() {
           equals('''
 
 Select value for ${blue}name$reset:
+${gray}Description of parameter name$reset
 
     ${green}1. Alpha   ✓$reset
     2. Bravo    
@@ -57,10 +58,10 @@ ${gray}Press number (1-3) or press Esc to cancel:$reset
         test('$flag prints help', () async {
           final result = await Process.run('hello', [flag]);
           expect(result.stdout, equals('''
-${blue}hello$reset
+${blue}hello$reset: ${gray}Description of command hello$reset
 params:
   required:
-    ${magenta}name (-n)$reset
+    ${magenta}name (-n)$reset ${gray}Description of parameter name$reset
     ${bold}values$reset: Alpha, Bravo, Charlie
 '''));
         });
@@ -70,11 +71,11 @@ params:
 
   integrationTests(
     '''
-        hello:
+        hello: ## Description of command hello
           script: echo "Hello {name}"
           params:
             required:
-              - name: '-n, --name, nm'
+              - name: '-n, --name, nm' ## Description of parameter name
                 values: [Alpha, Bravo, Charlie]
     ''',
     () {
@@ -94,6 +95,7 @@ params:
           equals('''
 
 Select value for ${blue}name$reset:
+${gray}Description of parameter name$reset
 
     ${green}1. Alpha   ✓$reset
     2. Bravo    
@@ -110,6 +112,7 @@ ${gray}Press number (1-3) or press Esc to cancel:$reset
           expect(result.stderr, equals('❌ Missing value for param: $bold${red}name$reset\n'));
         });
       }
+
       for (String flag in ['-n', '--name', 'nm']) {
         test('prints error when invalid value for required param is specified', () async {
           final result = await Process.run('hello', [flag, 'Delta']);
@@ -124,10 +127,10 @@ ${gray}Press number (1-3) or press Esc to cancel:$reset
         test('$flag prints help', () async {
           final result = await Process.run('hello', [flag]);
           expect(result.stdout, equals('''
-${blue}hello$reset
+${blue}hello$reset: ${gray}Description of command hello$reset
 params:
   required:
-    ${magenta}name (-n, --name, nm)$reset
+    ${magenta}name (-n, --name, nm)$reset ${gray}Description of parameter name$reset
     ${bold}values$reset: Alpha, Bravo, Charlie
 '''));
         });

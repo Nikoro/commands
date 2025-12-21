@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:commands_cli/colors.dart';
 import 'package:test/test.dart';
 
-import '../../../../../integration_tests.dart';
+import '../../../../../../integration_tests.dart';
 
 void main() {
   integrationTests(
@@ -11,7 +11,7 @@ void main() {
         hello: ## Description of command hello
           script: echo "Hello {name}"
           params:
-            optional:
+            required:
               - name: '-n, --name, nm' ## Description of parameter name
                 values: [Alpha, Bravo, Charlie]
                 default: Charlie
@@ -32,13 +32,13 @@ void main() {
       });
 
       for (String flag in ['-n', '--name', 'nm']) {
-        test('prints with default value when no value for optional param is specified', () async {
+        test('prints error when no value for required param is specified', () async {
           final result = await Process.run('hello', [flag]);
-          expect(result.stdout, equals('Hello Charlie\n'));
+          expect(result.stderr, equals('❌ Missing value for param: $bold${red}name$reset\n'));
         });
       }
       for (String flag in ['-n', '--name', 'nm']) {
-        test('prints error when invalid value for optional param is specified', () async {
+        test('prints error when invalid value for required param is specified', () async {
           final result = await Process.run('hello', [flag, 'Delta']);
           expect(result.stderr, equals('''
 ❌ Parameter $bold${red}name$reset has invalid value: "Delta"
@@ -53,7 +53,7 @@ void main() {
           expect(result.stdout, equals('''
 ${blue}hello$reset: ${gray}Description of command hello$reset
 params:
-  optional:
+  required:
     ${magenta}name (-n, --name, nm)$reset ${gray}Description of parameter name$reset
     ${bold}values$reset: Alpha, Bravo, Charlie
     ${bold}default$reset: "Charlie"
@@ -68,7 +68,7 @@ params:
         hello: ## Description of command hello
           script: echo "Hello {name}"
           params:
-            optional:
+            required:
               - name: '-n, --name, nm' ## Description of parameter name
                 values: [Alpha, Bravo, Charlie]
                 default: Delta

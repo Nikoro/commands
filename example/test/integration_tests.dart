@@ -9,12 +9,12 @@ final _commandsYaml = File('commands.yaml');
 void integrationTests(String description, dynamic Function() body) => group(description, () {
       late String originalContent;
 
-      setUp(() {
+      setUpAll(() {
         originalContent = _commandsYaml.readAsStringSync();
         _commandsYaml.writeAsStringSync(description);
       });
 
-      tearDown(() => _commandsYaml.writeAsStringSync(originalContent));
+      tearDownAll(() => _commandsYaml.writeAsStringSync(originalContent));
 
       body();
     });

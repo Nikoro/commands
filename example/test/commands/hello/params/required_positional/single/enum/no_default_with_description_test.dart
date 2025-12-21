@@ -3,16 +3,16 @@ import 'dart:io';
 import 'package:commands_cli/colors.dart';
 import 'package:test/test.dart';
 
-import '../../../../../integration_tests.dart';
+import '../../../../../../integration_tests.dart';
 
 void main() {
   integrationTests(
     '''
-        hello:
+        hello: ## Description of command hello
           script: echo "Hello {name}"
           params:
             required:
-              - name:
+              - name: ## Description of parameter name
                 values: [Alpha, Bravo, Charlie]
     ''',
     () {
@@ -30,6 +30,7 @@ void main() {
           equals('''
 
 Select value for ${blue}name$reset:
+${gray}Description of parameter name$reset
 
     ${green}1. Alpha   ✓$reset
     2. Bravo    
@@ -52,10 +53,10 @@ ${gray}Press number (1-3) or press Esc to cancel:$reset
         test('$flag prints help', () async {
           final result = await Process.run('hello', [flag]);
           expect(result.stdout, equals('''
-${blue}hello$reset
+${blue}hello$reset: ${gray}Description of command hello$reset
 params:
   required:
-    ${magenta}name$reset
+    ${magenta}name$reset ${gray}Description of parameter name$reset
     ${bold}values$reset: Alpha, Bravo, Charlie
 '''));
         });
