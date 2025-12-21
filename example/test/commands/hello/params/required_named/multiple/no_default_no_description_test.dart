@@ -82,7 +82,7 @@ void main() {
             expect(
                 result.stderr,
                 equals(
-                    '❌ Missing value for param: $bold${red}alpha$reset\n')); // This should be adjusted it should be: '❌ Missing value for params: $bold${red}alpha$reset, $bold${red}beta$reset\n'
+                    '❌ Missing value for params: $bold${red}alpha$reset, $bold${red}beta$reset\n'));
           });
 
           for (String charlie in ['-c', '--charlie']) {
@@ -96,7 +96,7 @@ void main() {
               expect(
                   result.stderr,
                   equals(
-                      '❌ Missing value for param: $bold${red}alpha$reset\n')); // This should be adjusted it should be: '❌ Missing value for params: $bold${red}alpha$reset, $bold${red}charlie$reset\n'
+                      '❌ Missing value for params: $bold${red}alpha$reset, $bold${red}charlie$reset\n'));
             });
 
             test('prints error when no value for required params [$beta] and [$charlie] is specified', () async {
@@ -104,7 +104,7 @@ void main() {
               expect(
                   result.stderr,
                   equals(
-                      '❌ Missing value for param: $bold${red}beta$reset\n')); // This should be adjusted it should be: '❌ Missing value for params: $bold${red}beta$reset, $bold${red}charlie$reset\n'
+                      '❌ Missing value for params: $bold${red}beta$reset, $bold${red}charlie$reset\n'));
             });
 
             test('prints error when no value for required params [$alpha], [$beta] and [$charlie] is specified',
@@ -113,7 +113,7 @@ void main() {
               expect(
                   result.stderr,
                   equals(
-                      '❌ Missing value for param: $bold${red}alpha$reset\n')); // This should be adjusted it should be: '❌ Missing value for params: $bold${red}beta$reset, $bold${red}beta$reset, $bold${red}charlie$reset\n'
+                      '❌ Missing value for params: $bold${red}alpha$reset, $bold${red}beta$reset, $bold${red}charlie$reset\n'));
             });
           }
         }

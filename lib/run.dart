@@ -140,6 +140,7 @@ Future<void> run(String name, List<String> args) async {
   final positionalArgs = <String>[];
   final passthroughArgs = <String>[];
   final argsCopy = List<String>.from(resolvedArgs);
+  final missingValues = <String>[]; // Track params with missing values
 
   // Helper to get param object by name
   Param getParamByName(String name) {
@@ -236,8 +237,7 @@ Future<void> run(String name, List<String> args) async {
           commandValues[paramName] = value;
         } else {
           if (isRequired) {
-            stderr.writeln('❌ Missing value for param: $bold$red$paramName$reset');
-            exit(1);
+            missingValues.add(paramName);
           }
         }
       }
@@ -245,6 +245,14 @@ Future<void> run(String name, List<String> args) async {
       positionalArgs.add(arg);
       passthroughArgs.add(arg);
     }
+  }
+
+  // Check if any required params are missing values
+  if (missingValues.isNotEmpty) {
+    stderr.writeln(
+      '❌ Missing value for param${missingValues.length > 1 ? 's' : ''}: ${missingValues.map((p) => '$bold$red$p$reset').join(', ')}',
+    );
+    exit(1);
   }
 
   final missingPositional = <String>[];
