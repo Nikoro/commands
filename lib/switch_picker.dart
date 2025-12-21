@@ -45,8 +45,7 @@ class SwitchPicker {
 
         // Add flags if available
         if (switchInfo != null && switchInfo.flags != null && switchInfo.flags!.isNotEmpty) {
-          final flagsStr = switchInfo.aliases.map((a) => '-$a').join(', ');
-          display += ' ${colors.gray}($flagsStr)${colors.reset}';
+          display += ' ${colors.gray}or: [${switchInfo.flags}]${colors.reset}';
         }
 
         // Add description if available

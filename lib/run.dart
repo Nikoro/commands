@@ -409,17 +409,20 @@ void _printSwitchesHelp(Command command, String indent) {
 
   for (final switchName in command.switches.keys) {
     final switchCommand = command.switches[switchName]!;
+    final switchInfo = command.getSwitchInfo(switchName);
 
     // Special formatting for switch named "default" - always bold
     final isSwitchNamedDefault = switchName == 'default';
     final nameFormatting = isSwitchNamedDefault ? bold : blue;
 
     // Build the switch line
-    final flags = switchCommand.flags != null ? ' (${switchCommand.flags})' : '';
+    final flags = switchInfo?.flags != null && switchInfo!.flags!.isNotEmpty
+        ? ' ${gray}or: [${switchInfo.flags}]$reset'
+        : '';
     // Don't show inline (default) marker anymore - we'll print default as a separate line
     final description = switchCommand.description != null ? ': $gray${switchCommand.description}$reset' : '';
 
-    print('$indent  $nameFormatting$switchName$flags$reset$description');
+    print('$indent  $nameFormatting$switchName$reset$flags$description');
 
     // If this switch has params, print them
     if (switchCommand.hasParameters) {
