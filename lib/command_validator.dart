@@ -18,19 +18,19 @@ class CommandValidator {
     final hasSwitch = commandData.containsKey('switch');
     final hasParams = commandData.containsKey('params');
 
+    // Rule 2: Params + Switch conflict (check this first, as params takes precedence over script)
+    if (hasParams && hasSwitch) {
+      return ValidationResult.error(
+        'Cannot use both $bold${red}params$reset and $bold${red}switch$reset at the same time',
+        hint: 'Parameters should be defined within individual switch cases, not at the switch level',
+      );
+    }
+
     // Rule 1: Script + Switch conflict
     if (hasScript && hasSwitch) {
       return ValidationResult.error(
         'Cannot use both $bold${red}script$reset and $bold${red}switch$reset at the same time',
         hint: 'Move your script content into a \'default\' switch case',
-      );
-    }
-
-    // Rule 2: Params + Switch conflict
-    if (hasParams && hasSwitch) {
-      return ValidationResult.error(
-        'Cannot use both $bold${red}params$reset and $bold${red}switch$reset at the same time',
-        hint: 'Parameters should be defined within individual switch cases, not at the switch level',
       );
     }
 
