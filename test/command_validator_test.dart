@@ -89,7 +89,10 @@ void main() {
           });
 
           expect(result.isValid, isFalse);
-          expect(result.errorMessage, contains('Cannot use \'params\' and \'switch\''));
+          expect(result.errorMessage, contains('Cannot use both'));
+          expect(result.errorMessage, contains('params'));
+          expect(result.errorMessage, contains('switch'));
+          expect(result.errorMessage, contains('at the same time'));
           expect(result.hint, contains('Parameters should be defined within individual switch cases'));
         });
 

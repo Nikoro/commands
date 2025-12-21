@@ -29,7 +29,7 @@ class CommandValidator {
     // Rule 2: Params + Switch conflict
     if (hasParams && hasSwitch) {
       return ValidationResult.error(
-        'Cannot use \'params\' and \'switch\' at the same level in command: $commandName',
+        'Cannot use both $bold${red}params$reset and $bold${red}switch$reset at the same time',
         hint: 'Parameters should be defined within individual switch cases, not at the switch level',
       );
     }
