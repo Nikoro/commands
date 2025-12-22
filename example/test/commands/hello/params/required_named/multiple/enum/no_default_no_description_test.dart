@@ -53,10 +53,10 @@ void main() {
                   result.stdout,
                   equals('''
 
-Select value for ${blue}name$reset:
+Select value for ${blue}alpha$reset:
 
-    ${green}1. A1   ✓$reset
-    2. A2    
+    ${green}1. A1 ✓$reset
+    2. A2  
     3. A3  
 
 ${gray}Press number (1-3) or press Esc to cancel:$reset

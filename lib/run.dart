@@ -331,41 +331,28 @@ Future<void> run(String name, List<String> args) async {
     }
   }
 
-  // First, collect all missing required params (both positional and named)
-  // This must happen BEFORE showing enum pickers
+  // Check if there are any missing non-enum-picker required params
+  // This determines whether we can show enum pickers or should report errors
+  bool hasNonEnumPickerMissingParams = false;
   for (final param in resolvedCommand.requiredParams) {
-    if (param.flags != null) {
-      if (commandValues[param.name] == null && !param.requiresEnumPicker) {
-        missingNamed.add(param.name);
-      }
+    if (param.flags != null && commandValues[param.name] == null && !param.requiresEnumPicker) {
+      hasNonEnumPickerMissingParams = true;
+      break;
     }
   }
 
   // Handle enum pickers for parameters without defaults and without provided values
-  // Only show picker if ALL other required params are already provided
+  // Only show picker if ALL other required params (non-enum-picker) are already provided
   // This runs AFTER positional processing to ensure invalid values are caught first
-  for (final param in resolvedCommand.requiredParams) {
-    // Only show picker if:
-    // 1. Parameter is an enum (has values)
-    // 2. No default value exists
-    // 3. No value has been provided yet
-    // 4. Parameter is required (we're iterating requiredParams only)
-    // 5. ALL other required params (except enum picker params) are already provided
-    if (param.requiresEnumPicker && commandValues[param.name] == null) {
-      // Check if there are other missing required params
-      // Count missing params excluding current param and other enum picker params
-      bool hasOtherMissingParams = false;
-      for (final otherParam in resolvedCommand.requiredParams) {
-        if (otherParam.name != param.name &&
-            commandValues[otherParam.name] == null &&
-            !otherParam.requiresEnumPicker) {
-          hasOtherMissingParams = true;
-          break;
-        }
-      }
-
-      // Only show picker if no other required params are missing
-      if (!hasOtherMissingParams) {
+  if (!hasNonEnumPickerMissingParams) {
+    for (final param in resolvedCommand.requiredParams) {
+      // Only show picker if:
+      // 1. Parameter is an enum (has values)
+      // 2. No default value exists
+      // 3. No value has been provided yet
+      // 4. Parameter is required (we're iterating requiredParams only)
+      // 5. ALL other non-enum-picker required params are already provided
+      if (param.requiresEnumPicker && commandValues[param.name] == null) {
         final selectedValue = EnumPicker.pick(param, param.name);
 
         if (selectedValue == null) {
@@ -374,11 +361,15 @@ Future<void> run(String name, List<String> args) async {
         }
 
         commandValues[param.name] = selectedValue;
-      } else {
-        // Other params are missing, so add this to missing list
-        if (param.flags != null) {
-          missingNamed.add(param.name);
-        }
+      }
+    }
+  }
+
+  // Collect all missing required params in declaration order
+  for (final param in resolvedCommand.requiredParams) {
+    if (param.flags != null) {
+      if (commandValues[param.name] == null) {
+        missingNamed.add(param.name);
       }
     }
   }
