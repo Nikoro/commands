@@ -322,12 +322,9 @@ Future<void> run(String name, List<String> args) async {
 
       commandValues[paramName] = value;
     } else if (commandValues[paramName] == null && positionalParams.contains(paramName)) {
-      // Don't add to missingPositional if it's an enum that requires a picker
-      // The picker will handle it after this section
-      final param = getParamByName(paramName);
-      if (!param.requiresEnumPicker) {
-        missingPositional.add(paramName);
-      }
+      // Add all missing positional params (including enum ones)
+      // We'll only show enum picker if NO positional params are missing
+      missingPositional.add(paramName);
     }
   }
 
@@ -343,8 +340,9 @@ Future<void> run(String name, List<String> args) async {
 
   // Handle enum pickers for parameters without defaults and without provided values
   // Only show picker if ALL other required params (non-enum-picker) are already provided
+  // AND there are no missing positional params
   // This runs AFTER positional processing to ensure invalid values are caught first
-  if (!hasNonEnumPickerMissingParams) {
+  if (!hasNonEnumPickerMissingParams && missingPositional.isEmpty) {
     for (final param in resolvedCommand.requiredParams) {
       // Only show picker if:
       // 1. Parameter is an enum (has values)
@@ -352,6 +350,7 @@ Future<void> run(String name, List<String> args) async {
       // 3. No value has been provided yet
       // 4. Parameter is required (we're iterating requiredParams only)
       // 5. ALL other non-enum-picker required params are already provided
+      // 6. No positional params are missing
       if (param.requiresEnumPicker && commandValues[param.name] == null) {
         final selectedValue = EnumPicker.pick(param, param.name);
 
