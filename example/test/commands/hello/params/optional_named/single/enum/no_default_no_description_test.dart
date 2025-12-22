@@ -67,9 +67,9 @@ params:
     ''',
     () {
       for (String flag in ['-n', '--name', 'nm']) {
-        for (Object param in ['Alpha', 'Bravo', 'Charlie']) {
+        for (String param in ['Alpha', 'Bravo', 'Charlie']) {
           test('prints "Hello $param"', () async {
-            final result = await Process.run('hello', [flag, '$param']);
+            final result = await Process.run('hello', [flag, param]);
             expect(result.stdout, equals('Hello $param\n'));
           });
         }

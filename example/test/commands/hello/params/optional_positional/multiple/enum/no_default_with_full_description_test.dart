@@ -1,0 +1,60 @@
+import 'dart:io';
+
+import 'package:commands_cli/colors.dart';
+import 'package:test/test.dart';
+
+import '../../../../../../integration_tests.dart';
+
+void main() {
+  integrationTests(
+    '''
+        hello: ## Description of command hello
+          script: |
+            echo "A: {alpha}, B: {beta}, C: {charlie}"
+          params:
+            optional:
+              - alpha: ## Description of parameter alpha
+                values: [A1, A2, A3]
+              - beta: ## Description of parameter beta
+              - charlie: ## Description of parameter charlie
+    ''',
+    () {
+      for (String value in ['A1', 'A2', 'A3']) {
+        test('prints "A: $value, B: , C: "', () async {
+          final result = await Process.run('hello', [value]);
+          expect(result.stdout, equals('A: $value, B: , C: \n'));
+        });
+
+        test('prints "A: $value, B: y, C: "', () async {
+          final result = await Process.run('hello', [value, 'y']);
+          expect(result.stdout, equals('A: $value, B: y, C: \n'));
+        });
+
+        test('prints "A: $value, B: y, C: z"', () async {
+          final result = await Process.run('hello', [value, 'y', 'z']);
+          expect(result.stdout, equals('A: $value, B: y, C: z\n'));
+        });
+      }
+
+      test('prints "A: , B: , C: " when no optional param is specified', () async {
+        final result = await Process.run('hello', []);
+        expect(result.stdout, equals('A: , B: , C: \n'));
+      });
+
+      for (String flag in ['-h', '--help']) {
+        test('$flag prints help', () async {
+          final result = await Process.run('hello', [flag]);
+          expect(result.stdout, equals('''
+${blue}hello$reset: ${gray}Description of command hello$reset
+params:
+  optional:
+    ${magenta}alpha$reset ${gray}Description of parameter alpha$reset
+    ${bold}values$reset: A1, A2, A3
+    ${magenta}beta$reset ${gray}Description of parameter beta$reset
+    ${magenta}charlie$reset ${gray}Description of parameter charlie$reset
+'''));
+        });
+      }
+    },
+  );
+}
